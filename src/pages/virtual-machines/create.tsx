@@ -14,8 +14,14 @@ interface VirtualMachineFormValues {
     instancetype: string;
     networkPattern: "Default" | "DefaultSecondary" | "Primary" | "PrimarySecondary";
     secondaryNetworks?: { name: string }[];
-    containerDiskImage: string;
-    containerDiskName: string;
+    // Volume Configuration
+    volumeType: "containerDisk" | "dataVolume";
+    // ContainerDisk fields
+    containerDiskImage?: string;
+    containerDiskName?: string;
+    // DataVolume fields
+    dataVolumeName?: string;
+    dataVolumeVolumeName?: string; // The name of the volume in VM spec
 }
 
 export const VirtualMachineCreate = () => {
@@ -30,7 +36,8 @@ export const VirtualMachineCreate = () => {
     } = useForm<VirtualMachineFormValues, any, VirtualMachineFormValues>({
         defaultValues: {
             networkPattern: "Default",
-            secondaryNetworks: [{ name: "" }]
+            secondaryNetworks: [{ name: "" }],
+            volumeType: "containerDisk"
         }
     });
 
@@ -51,7 +58,14 @@ export const VirtualMachineCreate = () => {
         optionValue: "metadata.name",
     });
 
+    const { options: dataVolumeOptions } = useSelect({
+        resource: "data_volumes",
+        optionLabel: "metadata.name",
+        optionValue: "metadata.name",
+    });
+
     const networkPattern = watch("networkPattern", "Default");
+    const volumeType = watch("volumeType", "containerDisk");
 
     const onFinishHandler = (data: VirtualMachineFormValues) => {
         const resource: any = {
@@ -120,15 +134,24 @@ export const VirtualMachineCreate = () => {
         resource.spec.template.spec.networks = networks;
 
         // Volume Configuration
-        const volumes = [{
-            name: data.containerDiskName,
-            containerDisk: {
-                image: data.containerDiskImage
-            }
-        }];
-        resource.spec.template.spec.volumes = volumes;
+        const volumes = [];
+        if (data.volumeType === "containerDisk") {
+            volumes.push({
+                name: data.containerDiskName || "containerdisk-0",
+                containerDisk: {
+                    image: data.containerDiskImage
+                }
+            });
+        } else if (data.volumeType === "dataVolume") {
+            volumes.push({
+                name: data.dataVolumeVolumeName || "datavolume-0",
+                dataVolume: {
+                    name: data.dataVolumeName
+                }
+            });
+        }
 
-        // Note: Disks are omitted in design for containerDisk, so we don't add them.
+        resource.spec.template.spec.volumes = volumes;
 
         onFinish(resource);
     };
@@ -231,26 +254,76 @@ export const VirtualMachineCreate = () => {
                 )}
 
                 <Divider />
-                <Typography variant="h6">Volume Configuration (ContainerDisk)</Typography>
+                <Typography variant="h6">Volume Configuration</Typography>
 
-                <TextField
-                    {...register("containerDiskName", { required: "Volume Name is required" })}
-                    error={!!errors.containerDiskName}
-                    helperText={errors.containerDiskName?.message as string}
-                    label="Volume Name"
-                    defaultValue="containerdisk-0"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                    {...register("containerDiskImage", { required: "Container Image is required" })}
-                    error={!!errors.containerDiskImage}
-                    helperText={errors.containerDiskImage?.message as string}
-                    label="Container Image"
-                    placeholder="e.g. quay.io/containerdisks/rocky:9"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
+                <FormControl fullWidth>
+                    <InputLabel id="volume-type-label">Volume Type</InputLabel>
+                    <Select
+                        labelId="volume-type-label"
+                        {...register("volumeType", { required: true })}
+                        defaultValue="containerDisk"
+                        label="Volume Type"
+                    >
+                        <MenuItem value="containerDisk">Container Disk</MenuItem>
+                        <MenuItem value="dataVolume">Data Volume</MenuItem>
+                    </Select>
+                </FormControl>
+
+                {volumeType === "containerDisk" && (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, border: '1px dashed grey', p: 2, borderRadius: 1 }}>
+                        <TextField
+                            {...register("containerDiskName", { required: "Volume Name is required" })}
+                            error={!!errors.containerDiskName}
+                            helperText={errors.containerDiskName?.message as string}
+                            label="Volume Name"
+                            defaultValue="containerdisk-0"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                            {...register("containerDiskImage", { required: "Container Image is required" })}
+                            error={!!errors.containerDiskImage}
+                            helperText={errors.containerDiskImage?.message as string}
+                            label="Container Image"
+                            placeholder="e.g. quay.io/containerdisks/rocky:9"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Box>
+                )}
+
+                {volumeType === "dataVolume" && (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, border: '1px dashed grey', p: 2, borderRadius: 1 }}>
+                        <TextField
+                            {...register("dataVolumeVolumeName", { required: "Volume Name is required" })}
+                            error={!!errors.dataVolumeVolumeName}
+                            helperText={errors.dataVolumeVolumeName?.message as string}
+                            label="Volume Name"
+                            defaultValue="datavolume-0"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <FormControl fullWidth>
+                            <InputLabel id="datavolume-select-label">Select Data Volume</InputLabel>
+                            <Select
+                                labelId="datavolume-select-label"
+                                {...register("dataVolumeName", { required: "Data Volume is required" })}
+                                label="Select Data Volume"
+                                defaultValue=""
+                                error={!!errors.dataVolumeName}
+                            >
+                                {dataVolumeOptions.map((option: any) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {errors.dataVolumeName && (
+                                <FormHelperText error>{errors.dataVolumeName.message as string}</FormHelperText>
+                            )}
+                        </FormControl>
+                    </Box>
+                )}
 
             </Box>
         </Create>
