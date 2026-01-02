@@ -50,6 +50,12 @@ import {
   VirtualMachineEdit,
   VirtualMachineShow,
 } from "./pages/virtual-machines";
+import {
+  DataVolumeList,
+  DataVolumeCreate,
+  DataVolumeEdit,
+  DataVolumeShow,
+} from "./pages/data-volumes";
 
 function App() {
   return (
@@ -118,11 +124,15 @@ function App() {
                     },
                   },
                   {
-                    name: "virtual_machine_cluster_instancetypes",
-                    list: "/virtual-machine-cluster-instancetypes",
+                    name: "data_volumes",
+                    list: "/data-volumes",
+                    create: "/data-volumes/create",
+                    edit: "/data-volumes/edit/:id",
+                    show: "/data-volumes/show/:id",
                     meta: {
-                      hide: true,
-                    }
+                      canDelete: true,
+                      label: "Data Volumes",
+                    },
                   },
                 ]}
                 options={{
@@ -170,6 +180,12 @@ function App() {
                       <Route path="create" element={<VirtualMachineCreate />} />
                       <Route path="edit/:id" element={<VirtualMachineEdit />} />
                       <Route path="show/:id" element={<VirtualMachineShow />} />
+                    </Route>
+                    <Route path="/data-volumes">
+                      <Route index element={<DataVolumeList />} />
+                      <Route path="create" element={<DataVolumeCreate />} />
+                      <Route path="edit/:id" element={<DataVolumeEdit />} />
+                      <Route path="show/:id" element={<DataVolumeShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>

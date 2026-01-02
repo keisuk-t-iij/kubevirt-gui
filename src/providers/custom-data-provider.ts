@@ -189,6 +189,50 @@ const handleDeleteOne = (_resource: string, key: string, id: any) => {
     } as any;
 };
 
+// ... existing imports
+
+const MOCK_DATA_VOLUMES_KEY = "mock_data_volumes";
+
+// ... existing initializations
+
+if (!localStorage.getItem(MOCK_DATA_VOLUMES_KEY)) {
+    const initialData = [
+        {
+            id: 1,
+            apiVersion: "cdi.kubevirt.io/v1beta1",
+            kind: "DataVolume",
+            metadata: { name: "rocky9-datavolume" },
+            spec: {
+                pvc: {
+                    accessModes: ["ReadWriteOnce"],
+                    resources: { requests: { storage: "10Gi" } }
+                },
+                source: {
+                    http: { url: "https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud.latest.x86_64.qcow2" }
+                }
+            }
+        },
+        {
+            id: 2,
+            apiVersion: "cdi.kubevirt.io/v1beta1",
+            kind: "DataVolume",
+            metadata: { name: "test-dv-pvc" },
+            spec: {
+                pvc: {
+                    accessModes: ["ReadWriteOnce"],
+                    resources: { requests: { storage: "20Gi" } }
+                },
+                source: {
+                    pvc: { name: "existing-pvc-name" }
+                }
+            }
+        }
+    ];
+    localStorage.setItem(MOCK_DATA_VOLUMES_KEY, JSON.stringify(initialData));
+}
+
+// ... existing handlers (getMockData, setMockData, etc.)
+
 export const customDataProvider: DataProvider = {
     ...baseDataProvider,
 
@@ -197,6 +241,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "user_defined_networks") return handleGetList(resource, MOCK_UDNS_KEY);
         if (resource === "cluster_user_defined_networks") return handleGetList(resource, MOCK_CUDNS_KEY);
         if (resource === "virtual_machine_cluster_instancetypes") return handleGetList(resource, MOCK_VM_CLUSTER_INSTANCETYPES_KEY);
+        if (resource === "data_volumes") return handleGetList(resource, MOCK_DATA_VOLUMES_KEY);
 
         return baseDataProvider.getList({ resource, pagination, filters, sorters, meta });
     },
@@ -205,6 +250,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "virtual_machines") return handleGetOne(resource, MOCK_VMS_KEY, id);
         if (resource === "user_defined_networks") return handleGetOne(resource, MOCK_UDNS_KEY, id);
         if (resource === "cluster_user_defined_networks") return handleGetOne(resource, MOCK_CUDNS_KEY, id);
+        if (resource === "data_volumes") return handleGetOne(resource, MOCK_DATA_VOLUMES_KEY, id);
 
         return baseDataProvider.getOne({ resource, id, meta });
     },
@@ -212,7 +258,7 @@ export const customDataProvider: DataProvider = {
     create: async ({ resource, variables, meta }) => {
         if (resource === "virtual_machines") return handleCreate(resource, MOCK_VMS_KEY, variables);
         if (resource === "user_defined_networks") return handleCreate(resource, MOCK_UDNS_KEY, variables);
-        // CUDN is read-only, no create handler needed strictly, but good to have if requirements change
+        if (resource === "data_volumes") return handleCreate(resource, MOCK_DATA_VOLUMES_KEY, variables);
 
         return baseDataProvider.create({ resource, variables, meta });
     },
@@ -220,6 +266,7 @@ export const customDataProvider: DataProvider = {
     update: async ({ resource, id, variables, meta }) => {
         if (resource === "virtual_machines") return handleUpdate(resource, MOCK_VMS_KEY, id, variables);
         if (resource === "user_defined_networks") return handleUpdate(resource, MOCK_UDNS_KEY, id, variables);
+        if (resource === "data_volumes") return handleUpdate(resource, MOCK_DATA_VOLUMES_KEY, id, variables);
 
         return baseDataProvider.update({ resource, id, variables, meta });
     },
@@ -227,6 +274,7 @@ export const customDataProvider: DataProvider = {
     deleteOne: async ({ resource, id, variables, meta }) => {
         if (resource === "virtual_machines") return handleDeleteOne(resource, MOCK_VMS_KEY, id);
         if (resource === "user_defined_networks") return handleDeleteOne(resource, MOCK_UDNS_KEY, id);
+        if (resource === "data_volumes") return handleDeleteOne(resource, MOCK_DATA_VOLUMES_KEY, id);
 
         return baseDataProvider.deleteOne({ resource, id, variables, meta });
     },
