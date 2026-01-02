@@ -45,6 +45,12 @@ export const VirtualMachineCreate = () => {
         optionValue: "metadata.name",
     });
 
+    const { options: udnOptions } = useSelect({
+        resource: "user_defined_networks",
+        optionLabel: "metadata.name",
+        optionValue: "metadata.name",
+    });
+
     const networkPattern = watch("networkPattern", "Default");
 
     const onFinishHandler = (data: VirtualMachineFormValues) => {
@@ -194,15 +200,21 @@ export const VirtualMachineCreate = () => {
                         <Typography variant="subtitle1">Secondary Networks</Typography>
                         {fields.map((field: any, index: number) => (
                             <Stack key={field.id} direction="row" spacing={2} alignItems="center">
-                                <TextField
-                                    {...register(`secondaryNetworks.${index}.name`, { required: "Secondary Network Name is required" })}
-                                    error={!!errors.secondaryNetworks?.[index]?.name}
-                                    helperText={errors.secondaryNetworks?.[index]?.name?.message as string}
-                                    label={`Secondary Network ${index + 1} (namespace/name)`}
-                                    placeholder="namespace/name"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                />
+                                <FormControl fullWidth>
+                                    <InputLabel id={`secondary-network-label-${index}`}>Secondary Network {index + 1}</InputLabel>
+                                    <Select
+                                        labelId={`secondary-network-label-${index}`}
+                                        {...register(`secondaryNetworks.${index}.name`, { required: "Secondary Network Name is required" })}
+                                        label={`Secondary Network ${index + 1}`}
+                                        defaultValue=""
+                                    >
+                                        {udnOptions.map((option: any) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                                 <IconButton onClick={() => remove(index)} disabled={fields.length === 1} color="error">
                                     <DeleteIcon />
                                 </IconButton>

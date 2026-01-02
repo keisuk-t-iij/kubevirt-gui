@@ -3,11 +3,12 @@
 
 ## リソース
 
-このアプリケーションは、Kubernetesの３つのリソースを参照および編集するためのものです。
+このアプリケーションは、Kubernetesの４つのリソースを参照および編集するためのものです。
 
 - UserDefinedNetwork
 - ClusterUserDefinedNetwork
 - VirutalMachine
+- DataVolume
 
 Kubernetesにはkubevirtとovn-kubernetesがインストールされていることを前提としています。
 
@@ -62,6 +63,57 @@ spec:
       networks: [<ネットワーク>]
       volumes: [<ボリューム>]
 ```
+
+### DataVolume
+
+DataVolumeはOSのテンプレートイメージが展開されたPVCを作成するためのリソースです。
+OSのテンプレートイメージは、CDI（Containerized Data Importer）によって展開されます。
+DataVolumeのテンプレートは２種類あります。
+
+1. 指定したURLからOSのテンプレートイメージをダウンロードして展開する
+2. 指定したPVCからOSのテンプレートイメージをコピーして展開する
+
+どちらもストレージサイズを指定する必要があります。
+
+1の具体的な値を除いたテンプレートは下記のとおりです。この場合、テンプレートイメージをダウンロードするためにURLを指定する必要があります。
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: <リソース名>
+spec:
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: <ストレージサイズ>
+  source:
+    http:
+      url: <OSのテンプレートイメージのURL>
+```
+
+2の具体的な値を除いたテンプレートは下記のとおりです。この場合、テンプレートイメージをコピーするためにPVCを指定する必要があります。指定するのはPVCの名前ですが、DataVolumeを作成すると同名のPVCが作成されるため、DataVolumeの名前を指定すると考えても間違いではありません。
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: <リソース名>
+spec:
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: <ストレージサイズ>
+  source:
+    pvc:
+      name: <OSのテンプレートイメージのPVC名>
+```
+
+通常、1のタイプで最低限一つのDataVolumeを作成し、２つ目以降は2のタイプで作成します。
 
 ## ネットワークとUserDefinedNetwork
 
@@ -304,16 +356,46 @@ spec:
       volumes: [<ボリューム>]
 ```
 
-## ボリューム
+## OS領域用ボリューム
 
-VirtualMachineのボリュームは以下の種類がありますが、最初はContainerDiskのみサポートします。
+VirtualMachineのOS領域用ボリュームは以下の種類があります。
 
 1. DataVolume
-2. CloudInitNoCloud
-3. CloudInitByNet
-4. ContainerDisk
-5. Ephemeral
-6. PersistentVolumeClaim
+2. ContainerDisk
+
+### DataVolume
+
+DataVolumeを利用する場合のVirtualMachineリソースは下記のようになります。
+
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: rocky9-default
+spec:
+  instancetype:
+    name: u1.small
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices:
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources: {}
+      networks:
+      - name: default
+        pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: <DataVolume名>
+        name: <ボリューム名>
+```
 
 ### containerDisk
 
@@ -345,8 +427,8 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
       - containerDisk:
-          image: ikr.iij.jp/virt/rocky-int:9
-        name: rocky-containerdisk-0
+          image: <イメージ名>
+        name: <ボリューム名>
 ```
 
 
