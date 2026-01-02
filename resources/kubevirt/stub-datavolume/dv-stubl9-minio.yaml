@@ -1,0 +1,16 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "dv-stubl9-minio"
+spec:
+  source:
+    http:
+      url: "https://ike-minio4500.thop.2iij.net/stub/stubl9/latest/stubl9-int.qcow2"
+      certConfigMap: "import-certs"
+  pvc:
+    storageClassName: hpe-standard01
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "20Gi"

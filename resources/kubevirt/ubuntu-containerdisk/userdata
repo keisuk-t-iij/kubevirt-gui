@@ -1,0 +1,5 @@
+#cloud-config
+write_files:
+  - content: AllowGroups svc-ike
+    path: /etc/ssh/sshd_config
+    append: true

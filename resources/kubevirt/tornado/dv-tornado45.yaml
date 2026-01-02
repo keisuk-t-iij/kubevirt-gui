@@ -1,0 +1,15 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "dv-tornado45"
+spec:
+  source:
+    http:
+      url: "https://tornado.tokyo.iiji.jp/IIJFW/4.5/4.5.00-release/amd64/IIJ-Firewall-4.5-00-release.qcow2.gz"
+      certConfigMap: "office-certs"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "4Gi"

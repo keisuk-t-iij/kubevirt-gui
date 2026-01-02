@@ -1,0 +1,10 @@
+apiVersion: k8s.ovn.org/v1
+kind: EgressIP
+metadata:
+  name: nginx
+spec:
+  egressIPs:
+    - 172.16.36.99
+  namespaceSelector:
+   matchLabels:
+     kubernetes.io/metadata.name: keisuk-t

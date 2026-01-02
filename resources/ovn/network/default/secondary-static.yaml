@@ -1,0 +1,13 @@
+apiVersion: k8s.ovn.org/v1
+kind: UserDefinedNetwork
+metadata:
+  name: secondary-static
+spec:
+  layer2:
+    role: Secondary
+    subnets:
+    - 10.10.24.0/24
+    ipam:
+      mode: Enabled
+      lifecycle: Persistent
+  topology: Layer2

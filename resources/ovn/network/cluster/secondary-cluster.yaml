@@ -1,0 +1,21 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: secondary-cluster
+spec:
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+        - "keisuk-t"
+        - "keisuk-t-primary"
+        - "keisuk-t-primary-l3"
+  network:
+    topology: Layer2
+    layer2:
+      role: Secondary
+      subnets: ["10.0.0.0/24"]
+      ipam:
+        mode: Enabled
+        lifecycle: Persistent

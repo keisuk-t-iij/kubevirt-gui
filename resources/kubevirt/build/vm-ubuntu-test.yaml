@@ -1,0 +1,30 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: ubuntu-test
+spec:
+  running: false
+  instancetype:
+    name: u1.small
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: dv-ubuntu-test
+        persistentVolumeClaim:
+          claimName: dv-ubuntu-test
+      - name: secretvolume
+        secret:
+          secretName: org
+      - cloudInitNoCloud:
+          secretRef:
+            name: cloud-init
+          networkDataSecretRef:
+            name: cloud-init
+        name: cloudinitdisk

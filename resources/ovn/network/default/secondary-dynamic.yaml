@@ -1,0 +1,10 @@
+apiVersion: k8s.ovn.org/v1
+kind: UserDefinedNetwork
+metadata:
+  name: secondary-dynamic
+spec:
+  layer2:
+    role: Secondary
+    subnets:
+    - 10.10.23.0/24
+  topology: Layer2

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dv-ubuntu-test
+spec:
+  storageClassName: hpe-standard01
+  dataSource:
+    name: dv-ubuntu
+    kind: PersistentVolumeClaim
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi

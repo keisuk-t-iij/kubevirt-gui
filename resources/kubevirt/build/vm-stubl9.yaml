@@ -1,0 +1,53 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: stubl9
+  name: stubl9
+spec:
+  running: false
+  template:
+    metadata:
+      annotations:
+        "cni.projectcalico.org/ipv4pools": "[\"svc-ike-hop-ippool\"]"
+      labels:
+        os: stubl9
+    spec:
+      terminationGracePeriodSeconds: 30
+#      nodeSelector:
+#        kubernetes.io/hostname: ike-w4516-dev
+      domain:
+        resources:
+          requests:
+            memory: 4096M
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: disk0
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+      volumes:
+      - dataVolume:
+          name: dv-stubl9
+        name: disk0
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            network:
+              version: 2
+              ethernets:
+                eth0:
+                  dhcp4: true
+            write_files:
+            - path: "/home/admin/.ssh/authorized_keys"
+              owner: admin:admin
+              permissions: '0640'
+              content: 'from="hopgate??.thop.2iij.net,hopgate????.thop.2iij.net" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK4NFwICIarZRtErrEpQyEAEMNkbVXSiiNGzOdd7NUtd admin@hopgate40.hop'
+            - path: "/etc/nftables/51-stub-hop-common.nft"
+              encoding: b64
+              owner: root:root
+              permissions: '0644'
+              content: dGFibGUgaW5ldCBmaWx0ZXIgewoJY2hhaW4gQWxsb3dGcm9tSG9wQ29tbW9uIHsKCQkjIGFjY2VwdCB0aG9wLWNvbW1vbiBtb25pdG9yIHJhbmdlCgkJaXAgc2FkZHIgMTAuMTQ2LjI0OC4wLzIyIGFjY2VwdAoJfQoJY2hhaW4gQWxsb3dGcm9tSG9wIHsKCQkjIGFjY2VwdCB0SE9QIHJhbmdlCgkJaXAgc2FkZHIgMTAuMTQ2LjAuMC8xNiBhY2NlcHQKCX0KfQo=

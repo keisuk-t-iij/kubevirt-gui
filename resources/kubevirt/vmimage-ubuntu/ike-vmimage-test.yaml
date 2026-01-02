@@ -1,0 +1,25 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: ike-vmimage-test
+spec:
+  instancetype:
+    name: u1.small
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: ubuntu-2204-test
+        persistentVolumeClaim:
+          claimName: ubuntu-2204-test
+      - name: secretvolume
+        secret:
+          secretName: org
+status: {}

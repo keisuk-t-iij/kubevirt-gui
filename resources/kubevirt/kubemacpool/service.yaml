@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubemacpool-service
+  namespace: kubemacpool-system
+spec:
+  ports:
+  - port: 443
+    targetPort: 8000
+  publishNotReadyAddresses: true
+  selector:
+    control-plane: mac-controller-manager

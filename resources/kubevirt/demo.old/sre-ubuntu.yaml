@@ -1,0 +1,38 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: sre-ubuntu
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: imported-volume-629j
+    spec:
+      source:
+        http:
+          url: https://ike-minio4500.thop.2iij.net/virt/ubuntu-int.qcow2
+      storage:
+        resources:
+          requests:
+            storage: 4Gi
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        memory:
+          guest: 512Mi
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: imported-volume-629j
+        name: imported-volume-629j
+      - cloudInitNoCloud:
+          networkDataBase64: bmV0d29yazoKICB2ZXJzaW9uOiAyCiAgZXRoZXJuZXRzOgogICAgZW5wMXMwOgogICAgICBkaGNwNDogdHJ1ZQo=
+          userDataBase64: I2Nsb3VkLWNvbmZpZwp3cml0ZV9maWxlczoKICAtIGNvbnRlbnQ6IEFsbG93R3JvdXBzIHN2Yy1pa2UKICAgIHBhdGg6IC9ldGMvc3NoL3NzaGRfY29uZmlnCiAgICBhcHBlbmQ6IHRydWUK
+        name: cloudinitdisk
+status: {}

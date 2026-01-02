@@ -1,0 +1,20 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: localnet-static
+spec:
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values: ["keisuk-t", "keisuk-t-primary", "keisuk-t-primary-l3"]
+  network:
+    topology: Localnet
+    localnet:
+      role: Secondary
+      physicalNetworkName: localnet-v2357
+      subnets:
+      - 10.10.25.0/24
+      ipam:
+        mode: Enabled
+        lifecycle: Persistent

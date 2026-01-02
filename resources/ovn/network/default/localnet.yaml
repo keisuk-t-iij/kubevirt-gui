@@ -1,0 +1,16 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: localnet-v2357
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "localnet-v2357",
+      "type": "ovn-k8s-cni-overlay",
+      "topology": "localnet",
+      "physicalNetworkName": "localnet-v2357",
+      "netAttachDefName": "keisuk-t/localnet-v2357",
+      "subnets": "172.16.37.0/24",
+      "gateway": "172.16.37.1"
+    }

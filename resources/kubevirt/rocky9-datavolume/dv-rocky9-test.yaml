@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dv-rocky9-test
+spec:
+  dataSource:
+    name: dv-rocky9
+    kind: PersistentVolumeClaim
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 12Gi

@@ -1,0 +1,48 @@
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-ike
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-ike-hop-ippool\"]"
+---
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-baton
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-baton-hop-ippool\"]"
+---
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-baton-stg
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-baton-stg-hop-ippool\"]"
+---
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-baton-prd
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-baton-prd-hop-ippool\"]"
+---
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-lip
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-lip-hop-ippool\"]"
+---
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterPreference
+metadata:
+  name: svc-swg
+spec:
+  annotations:
+    "cni.projectcalico.org/ipv4pools": "[\"svc-swg-hop-ippool\"]"
+---

@@ -1,0 +1,25 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: tornado45
+spec:
+  instancetype:
+    name: u1.small
+  preference:
+    inferFromVolume: dv-tornado45-test
+    inferFromVolumeFailurePolicy: Ignore
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: dv-tornado45-test
+        persistentVolumeClaim:
+          claimName: dv-tornado45-test
+status: {}

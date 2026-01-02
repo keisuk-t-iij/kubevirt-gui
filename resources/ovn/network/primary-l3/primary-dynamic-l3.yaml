@@ -1,0 +1,11 @@
+apiVersion: k8s.ovn.org/v1
+kind: UserDefinedNetwork
+metadata:
+  name: primary-dynamic
+spec: 
+  topology: Layer3
+  layer3:
+    role: Primary
+    subnets:
+    - cidr: 103.106.0.0/16
+      hostSubnet: 24

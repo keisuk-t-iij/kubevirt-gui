@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dv-tornado45-test
+spec:
+  accessModes:
+  - ReadWriteOnce
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: dv-tornado45
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: hpe-standard01

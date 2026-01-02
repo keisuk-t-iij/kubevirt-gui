@@ -1,0 +1,27 @@
+#cloud-config
+users:
+- name: keisuk-t
+  shell: /bin/bash
+  sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+  ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAoOyRkmXLP8nn4uoNWkZxsm2PttzB0e1w5BhjM7EsH57n1z6+voH0lYCI0t91UXrArDZ3Zv7EORyUXe1b33RLNxX1Gwr6ocv0CXK3ur6ERNIWPrmEc9tSyhEUWebuG553R190dQvztbJKOmWO0Dk+4prCUqVbl7eDKVpW8Ay9sRU=
+chpasswd:
+  list: |
+     keisuk-t:hogehoge
+  expire: False
+yum_repos:
+  grafana:
+    name: grafana Stable - amd64
+    baseurl: https://rpm.grafana.com
+    skip_if_unavailable: true
+    gpgcheck: true
+    gpgkey: https://rpm.grafana.com/gpg.key
+  hashicorp:
+    name: hashicorp Stable - amd64
+    baseurl: https://apt.releases.hashicorp.com
+    skip_if_unavailable: true
+    gpgcheck: true
+    gpgkey: https://apt.releases.hashicorp.com/gpg
+packages:
+  - alloy
+  - vault

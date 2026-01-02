@@ -1,0 +1,10 @@
+net filter {
+        chain AllowFromHopCommon {
+                # accept thop-common monitor range
+                ip saddr 10.146.248.0/22 accept
+        }
+        chain AllowFromHop {
+                # accept tHOP range
+                ip saddr 10.146.0.0/16 accept
+        }
+}

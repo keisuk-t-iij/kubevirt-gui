@@ -1,0 +1,29 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: stubl9c
+spec:
+  instancetype:
+    kind: virtualmachineclusterinstancetype
+    name: u1.small
+    revisionName: stubl9c-u1.small-62749980-8b0e-46c1-b0e2-d87d0da117f0-1
+  preference:
+    name: svc-ike
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - containerDisk:
+          image: ikr.iij.jp/stub/stubl9-int:20231204
+        name: stubl9c-containerdisk-0
+      - name: org
+        secret:
+          secretName: org
+status: {}

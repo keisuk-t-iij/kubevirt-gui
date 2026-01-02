@@ -1,0 +1,12 @@
+#cloud-config
+users:
+  - name: rocky
+    shell: /bin/bash
+    groups: [wheel, sudo, users]
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+chpasswd:
+  list: |
+    rocky:hogehoge
+  expire: False

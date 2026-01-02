@@ -1,0 +1,47 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: StorageProfile
+metadata:
+  labels:
+    app: containerized-data-importer
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: cdi-controller
+    cdi.kubevirt.io: ""
+  name: nfs-client
+spec:
+  claimPropertySets:
+  - accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    volumeMode: Filesystem
+---
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: StorageProfile
+metadata:
+  labels:
+    app: containerized-data-importer
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: cdi-controller
+    cdi.kubevirt.io: ""
+  name: managed-nfs-storage
+spec:
+  claimPropertySets:
+  - accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    volumeMode: Filesystem
+---
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: StorageProfile
+metadata:
+  labels:
+    app: containerized-data-importer
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: cdi-controller
+    cdi.kubevirt.io: ""
+  name: nfs-subdir-external-provisioner
+spec:
+  claimPropertySets:
+  - accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    volumeMode: Filesystem

@@ -1,0 +1,26 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: rocky9c
+spec:
+  instancetype:
+    name: u1.small
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - containerDisk:
+          image: ikr.iij.jp/virt/rocky:9
+#          image: ikr.iij.jp/virt/rocky-int:9
+        name: rocky-containerdisk-0
+#      - name: secretvolume
+#        secret:
+#          secretName: org
+status: {}

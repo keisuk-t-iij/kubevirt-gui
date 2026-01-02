@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ubuntu2204c
+  name: ubuntu2204c
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 12345
+  selector:
+    os: ubuntu

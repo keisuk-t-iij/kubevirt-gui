@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rocky9
+  name: rocky9
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 12345
+  selector:
+    os: rocky

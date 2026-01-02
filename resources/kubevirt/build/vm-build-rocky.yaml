@@ -1,0 +1,31 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: build-rocky9
+spec:
+  running: false
+  instancetype:
+    name: u1.small
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: ubuntu-vm-root
+        persistentVolumeClaim:
+          claimName: ubuntu-vm-root
+      - name: ubuntu-vm-data
+        persistentVolumeClaim:
+          claimName: ubuntu-vm-data
+      - name: dv-rocky9-test
+        persistentVolumeClaim:
+          claimName: dv-rocky9-test
+#      - cloudInitNoCloud:
+#          secretRef:
+#            name: build-ubuntu
+#        name: cloudinitdisk

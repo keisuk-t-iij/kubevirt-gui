@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: csi.hpe.com
+    volume.kubernetes.io/storage-provisioner: csi.hpe.com
+  name: rocky9-clone
+  namespace: keisuk-t
+spec:
+  accessModes:
+  - ReadWriteOnce
+  dataSource:
+    apiGroup: null
+    kind: PersistentVolumeClaim
+    name: sre-rocky9
+  dataSourceRef:
+    apiGroup: null
+    kind: PersistentVolumeClaim
+    name: sre-rocky9
+  resources:
+    requests:
+      storage: 30Gi
+  storageClassName: hpe-standard01
+  volumeName: pvc-0c90518c-6582-4055-8a94-1663a50a1c57

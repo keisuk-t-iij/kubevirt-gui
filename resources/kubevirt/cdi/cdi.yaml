@@ -1,0 +1,24 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  name: cdi
+spec:
+  config:
+    featureGates:
+    - HonorWaitForFirstConsumer
+    scratchSpaceStorageClass: hpe-standard01
+  imagePullPolicy: IfNotPresent
+#  infra:
+#    nodeSelector:
+#      ike.iij.jp/instance-type: "midsv4"
+#    tolerations:
+#      - effect: NoSchedule
+#        operator: Exists
+#      - key: CriticalAddonsOnly
+#        operator: Exists
+#  workload:
+#    nodeSelector:
+#      ike.iij.jp/instance-type: "midsv4"
+#    tolerations:
+#      - effect: NoSchedule
+##        operator: Exists

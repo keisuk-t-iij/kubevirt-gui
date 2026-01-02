@@ -1,0 +1,31 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: ike-vmimage
+spec:
+  instancetype:
+    name: u1.small
+  preference:
+    inferFromVolume: ubuntu-2204-ike
+    inferFromVolumeFailurePolicy: Ignore
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: {}
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: ubuntu-2204-ike
+        persistentVolumeClaim:
+          claimName: ubuntu-2204-ike
+      - cloudInitNoCloud:
+          userDataBase64: I2Nsb3VkLWNvbmZpZwp1c2VyczoKLSBuYW1lOiBrZWlzdWstdAogIHNoZWxsOiAvYmluL2Jhc2gKICBzdWRvOiBbIkFMTD0oQUxMKSBOT1BBU1NXRDpBTEwiXQogIHNzaF9hdXRob3JpemVkX2tleXM6CiAgICAtIHNzaC1yc2EgQUFBQUIzTnphQzF5YzJFQUFBQUJJd0FBQUlFQW9PeVJrbVhMUDhubjR1b05Xa1p4c20yUHR0ekIwZTF3NUJoak03RXNINTduMXo2K3ZvSDBsWUNJMHQ5MVVYckFyRFozWnY3RU9SeVVYZTFiMzNSTE54WDFHd3I2b2N2MENYSzN1cjZFUk5JV1BybUVjOXRTeWhFVVdlYnVHNTUzUjE5MGRRdnp0YkpLT21XTzBEays0cHJDVXFWYmw3ZURLVnBXOEF5OXNSVT0KY2hwYXNzd2Q6CiAgbGlzdDogfAogICAgIGtlaXN1ay10OmhvZ2Vob2dlCiAgZXhwaXJlOiBGYWxzZQo=
+        name: cloudinitdisk
+      - name: secretvolume
+        secret:
+          secretName: org
+status: {}

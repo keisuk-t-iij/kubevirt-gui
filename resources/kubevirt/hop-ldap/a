@@ -1,0 +1,31 @@
+dn: uid=makino,ou=People,dc=hop,dc=2iij,dc=net
+changetype: modify
+replace: sshPublicKey
+sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxDObUK1hNFzSklXVM7+fuq2i89SnHxav6MdYQb22ZRgTSklqPiRnKEQpr9Vd5hieQu3WN4+YfrNsC9O0gho6mjAqsIETFg0TdDH7DyiqyqaWFoWaxkxXQ7I/6LuTv3GrBl33xkOeazd0yWd7bMh2fdFzmocwgwiTm1dXERfeQe0bxx/iHivl9leh1RJfj/Q+gLpzxYL6ZAW0s66BWEp7yA00D2D7llOu5hxk4FNAQgDFxZq1PZKBK/q2K+nJ+4herL1QPUZstE+mmvK/kqY5a/q89dEiAq5wGqGG4+rYcypsTmHpl6g9L25FJAU+TPWz8Zw7K5UENbP+uRnL9AJTDw==
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOHI33sS4pWEDr/8Rg1fhh3zLGoX1DkuUG9QJ1/Rih08
+
+dn: uid=kamada,ou=People,dc=hop,dc=2iij,dc=net
+changetype: modify
+replace: sshPublicKey
+sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxq+24+8Y/xg9wPCLtaXIsD1gKySMZWUeQzyP8fDfN+HK2BYydRjCgSp07wEBUbhzl/iakA9uC0M7JYxr735rTwuq2vYs1Te18OK2lWLn2gaHih8d1d8T9h68HqTpRLNNfo6l1HPSQuaf6piKRoJ+gAqXf5RW35gI+mEjwEAk86b83djhbXsHL+ssepiRB1cnYWmT6YGmJHt6sGs9uvrO5YVtGTn/EW0HKB49AhCnCqUHRPRH0DfBCL1j2zKtYA8RFOqXNegzGxt2aXt4myobaF4ayw75lik8hHA4VslnI5nYKJVfrVkFHzMb2qRbZHh/6boN/4qGXCQ0ii0VekyZz
+
+dn: uid=takahiko,ou=People,dc=hop,dc=2iij,dc=net
+changetype: modify
+replace: sshPublicKey
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPDtXQuhH24w7TsAIgYL59i9nrlJwWt15s4/wDpD6Cg9
+
+dn: uid=tkanai,ou=People,dc=hop,dc=2iij,dc=net
+changetype: modify
+replace: sshPublicKey
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGrUHbjzy1UtYJ9deXRSVxoseAb3/h9yCW6/hJBKeuBr
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrGDu3eYa5Tej5d9/OJzHxM4IOnAEOmKMPnM1Wwg8hu
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK04f2i6C3KR3Q6+FX5+0REeBjSxJGylZhAUUDAJqqRM
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHJ5/7dHaTv37G5NfWodnqMavkuasGO4tUskVIhcKtgd
+
+dn: uid=taichi-shimo,ou=People,dc=hop,dc=2iij,dc=net
+changetype: modify
+replace: sshPublicKey
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO3QzSmTNysLPj1qLRRqvVqtO/C/90QJJJkrBb918PN+
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJKcD6jH+tLCPJQN6FkTRj3Vg8bxkP5kYJpfndRLJ6C
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINAovRHudiC0Pg9A8Kx3GM2TyMjuJwR8NJVu72QgmXtp
+

@@ -1,0 +1,31 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: rocky
+  name: rocky9
+spec:
+  runStrategy: Always
+  instancetype:
+    name: u1.small
+  template:
+    metadata:
+      labels:
+        os: rocky
+        expose: vm
+    spec:
+      hostname: "rocky9"
+      subdomain: "virt"
+      domain:
+        devices: {}
+        resources: {}
+      volumes:
+      - dataVolume:
+          name: dv-rocky9-int
+        name: disk0
+      - name: secretvolume
+        secret:
+          secretName: org
+      - cloudInitNoCloud:
+          userDataBase64: I2Nsb3VkLWNvbmZpZwp3cml0ZV9maWxlczoKICAtIGNvbnRlbnQ6IEFsbG93R3JvdXBzIHN2Yy1pa2UKICAgIHBhdGg6IC9ldGMvc3NoL3NzaGRfY29uZmlnCiAgICBhcHBlbmQ6IHRydWUK
+        name: cloudinitdisk

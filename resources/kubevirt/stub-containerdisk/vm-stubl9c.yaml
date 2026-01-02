@@ -1,0 +1,48 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: stubl9
+  name: stubl9c
+spec:
+  running: false
+  template:
+    metadata:
+      annotations:
+        "cni.projectcalico.org/ipv4pools": "[\"svc-ike-hop-ippool\"]"
+      labels:
+        os: stubl9
+    spec:
+      terminationGracePeriodSeconds: 30
+      domain:
+        resources:
+          requests:
+            memory: 16Gi
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: disk0
+          - disk:
+              bus: virtio
+            name: data
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          - disk:
+              bus: virtio
+            name: secretvolume
+      volumes:
+      - containerDisk:
+          image: ikr.iij.jp/stub/stubl9-int:20231204
+        name: disk0
+      - name: data
+        persistentVolumeClaim:
+          claimName: ubuntu-vm-data
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          secretRef:
+            name: cloud-init
+      - name: secretvolume
+        secret:
+          secretName: org

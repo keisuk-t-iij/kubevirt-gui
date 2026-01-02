@@ -1,0 +1,51 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: ubuntu
+  name: ubuntu
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        os: ubuntu
+    spec:
+      terminationGracePeriodSeconds: 30
+      domain:
+        resources:
+          requests:
+            memory: 1024M
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: disk0
+          - disk:
+              bus: virtio
+            name: disk1
+          - disk:
+              bus: virtio
+            name: ubuntu-2204-ike
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+      volumes:
+      - dataVolume:
+          name: ubuntu-vm-root
+        name: disk0
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            ssh_pwauth: true
+            chpasswd:
+              list: |
+                ubuntu:ubuntu
+              expire: false
+      - dataVolume:
+          name: ubuntu-vm-data
+        name: disk1
+      - name: ubuntu-2204-ike
+        persistentVolumeClaim:
+          claimName: ubuntu-2204-ike

@@ -1,0 +1,34 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: rocky9-secondary-static
+spec:
+  instancetype:
+    name: u1.small
+  runStrategy: Always
+  preference:
+    kind: VirtualMachinePreference
+    name: default-masquerade-pref
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices:
+          interfaces:
+          - name: default
+          - name: secondary
+            bridge: {}
+        resources: {}
+      networks:
+      - name: default
+        pod: {}
+      - name: secondary
+        multus:
+          networkName: keisuk-t/secondary-static
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - containerDisk:
+          image: ikr.iij.jp/virt/rocky-int:9
+        name: rocky-containerdisk-0

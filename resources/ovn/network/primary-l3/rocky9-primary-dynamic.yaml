@@ -1,0 +1,29 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rocky9-primary-dynamic
+spec:
+  instancetype:
+    name: u1.small
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices:
+          interfaces:
+          - name: primary-dynamic
+            masquerade: {}
+        resources: {}
+      networks:
+      - name: primary-dynamic
+        pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - containerDisk:
+          image: ikr.iij.jp/virt/rocky-int:9
+        name: rocky-containerdisk-0
+      - cloudInitNoCloud:
+          userDataBase64: I2Nsb3VkLWNvbmZpZwp1c2VyczoKICAtIG5hbWU6IHJvY2t5CiAgICBzaGVsbDogL2Jpbi9iYXNoCiAgICBncm91cHM6IFt3aGVlbCwgc3VkbywgdXNlcnNdCiAgICBzdWRvOiBbJ0FMTD0oQUxMKSBOT1BBU1NXRDpBTEwnXQogICAgbG9ja19wYXNzd2Q6IGZhbHNlCgpjaHBhc3N3ZDoKICBsaXN0OiB8CiAgICByb2NreTpob2dlaG9nZQogIGV4cGlyZTogRmFsc2UK
+        name: cloudinitdisk

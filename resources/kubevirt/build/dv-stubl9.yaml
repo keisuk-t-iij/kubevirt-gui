@@ -1,0 +1,15 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "dv-stubl9"
+spec:
+  source:
+    http:
+      url: "http://hop-boot-master.thop.2iij.net/stubl9//latest/stubl9.qcow2"
+  pvc:
+    storageClassName: hpe-standard01
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "20Gi"

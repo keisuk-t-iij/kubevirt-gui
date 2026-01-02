@@ -1,0 +1,105 @@
+logging {
+	level  = "info" // error, warn, info, debug
+	format = "logfmt"
+}
+
+discovery.relabel "journal" {
+	targets = []
+
+	rule {
+		source_labels = ["__journal__systemd_unit"]
+		target_label  = "systemd_unit"
+	}
+
+	rule {
+		source_labels = ["__journal__hostname"]
+		target_label  = "nodename"
+	}
+
+	rule {
+		source_labels = ["__journal_syslog_identifier"]
+		target_label  = "syslog_identifier"
+	}
+}
+
+loki.source.journal "journal" {
+	path          = "/run/log/journal"
+	relabel_rules = discovery.relabel.journal.rules
+	forward_to    = [loki.write.default.receiver]
+	labels        = {
+		job = "journal",
+	}
+}
+
+prometheus.exporter.unix "integrations_node_exporter" {
+	enable_collectors  = ["tcpstat", "network_route"]
+	disable_collectors = ["ipvs"]
+
+	filesystem {
+		fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup|cgroup2|configfs|debugfs|devpts|devtmpfs|tmpfs|overlay|fusectl|hugetlbfs|mqueue|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs|nsfs|squashfs)$"
+		mount_points_exclude = "^(/proc|/var/lib/kubelet/pods)"
+		mount_timeout        = "5s"
+	}
+
+	netdev {
+		device_exclude = "^(cali|docker|tunl)[0-9a-f]+$"
+	}
+}
+
+discovery.relabel "integrations_node_exporter" {
+	targets = prometheus.exporter.unix.integrations_node_exporter.targets
+
+	rule {
+		target_label = "instance"
+		replacement  = format("%s:9092", env("HOSTNAME"))
+	}
+
+	rule {
+		target_label = "job"
+		replacement  = "integrations/node_exporter"
+	}
+}
+
+prometheus.scrape "integrations_node_exporter" {
+	targets         = discovery.relabel.integrations_node_exporter.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	job_name        = "integrations/node_exporter"
+	scrape_interval = "30s"
+}
+
+prometheus.remote_write "default" {
+	external_labels = {
+		cluster = "sri-dev",
+	}
+
+	endpoint {
+		url = "https://ike-prometheus-dev.thop.2iij.net/api/v1/push"
+
+		tls_config {
+			ca_file   = "/etc/org/ca.crt"
+			cert_file = "/etc/org/tls.crt"
+			key_file  = "/etc/org/tls.key"
+		}
+
+		queue_config { }
+
+		metadata_config { }
+	}
+}
+
+loki.write "default" {
+	external_labels = {
+		cluster  = "sri-dev",
+		hostname = env("HOSTNAME"),
+	}
+
+	endpoint {
+		url = "https://ike-loki-dev.thop.2iij.net/loki/api/v1/push"
+
+		tls_config {
+			ca_file   = "/etc/org/ca.crt"
+			cert_file = "/etc/org/tls.crt"
+			key_file  = "/etc/org/tls.key"
+		}
+	}
+}

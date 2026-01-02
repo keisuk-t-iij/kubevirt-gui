@@ -1,0 +1,13 @@
+apiVersion: "k8s.ovn.org/v1"
+kind: UserDefinedNetwork
+metadata:
+  name: primary-static
+spec:
+  topology: Layer2
+  layer2:
+    role: Primary
+    subnets:
+      - "103.105.0.0/24"
+    ipam:
+      mode: Enabled
+      lifecycle: Persistent

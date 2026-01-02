@@ -1,0 +1,9 @@
+apiVersion: k8s.ovn.org/v1
+kind: EgressService
+metadata:
+  name: nginx
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: ike-melchior01-w4505.thop.2iij.net
+  sourceIPBy: LoadBalancerIP
