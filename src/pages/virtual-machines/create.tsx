@@ -1,5 +1,6 @@
 import { Create } from "@refinedev/mui";
-import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, Button, IconButton, Stack } from "@mui/material";
+import { useSelect } from "@refinedev/core";
+import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, Button, IconButton, Stack, FormHelperText } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
 import { useFieldArray } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -36,6 +37,12 @@ export const VirtualMachineCreate = () => {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "secondaryNetworks"
+    });
+
+    const { options: instanceTypeOptions } = useSelect({
+        resource: "virtual_machine_cluster_instancetypes",
+        optionLabel: "metadata.name",
+        optionValue: "metadata.name",
     });
 
     const networkPattern = watch("networkPattern", "Default");
@@ -144,14 +151,25 @@ export const VirtualMachineCreate = () => {
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                 />
-                <TextField
-                    {...register("instancetype", { required: "Instance Type is required" })}
-                    error={!!errors.instancetype}
-                    helperText={errors.instancetype?.message as string}
-                    label="Instance Type (e.g. u1.small)"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
+
+                <FormControl fullWidth>
+                    <InputLabel id="instancetype-label">Instance Type</InputLabel>
+                    <Select
+                        labelId="instancetype-label"
+                        {...register("instancetype", { required: "Instance Type is required" })}
+                        label="Instance Type"
+                        defaultValue=""
+                    >
+                        {instanceTypeOptions.map((option: any) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {errors.instancetype && (
+                        <FormHelperText error>{errors.instancetype.message as string}</FormHelperText>
+                    )}
+                </FormControl>
 
                 <Divider />
                 <Typography variant="h6">Network Configuration</Typography>

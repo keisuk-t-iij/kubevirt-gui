@@ -117,6 +117,13 @@ function App() {
                       label: "Virtual Machines",
                     },
                   },
+                  {
+                    name: "virtual_machine_cluster_instancetypes",
+                    list: "/virtual-machine-cluster-instancetypes",
+                    meta: {
+                      hide: true,
+                    }
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,

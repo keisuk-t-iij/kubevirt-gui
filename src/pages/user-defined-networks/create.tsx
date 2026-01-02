@@ -103,14 +103,15 @@ export const UserDefinedNetworkCreate = () => {
 
                 <TextField
                     {...register("subnet", {
-                        required: "This field is required",
+                        required: networkType === "Layer2" ? "This field is required" : false,
                         pattern: {
                             value: /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
                             message: "Invalid CIDR format (e.g., 192.168.1.0/24)"
                         }
                     })}
+                    disabled={networkType === "Layer3"}
                     error={!!errors.subnet}
-                    helperText={(errors.subnet?.message as string) || "CIDR notation (e.g. 192.168.1.0/24)"}
+                    helperText={(errors.subnet?.message as string) || (networkType === "Layer3" ? "Subnet is not configurable for Layer 3 (Primary) networks" : "CIDR notation (e.g. 192.168.1.0/24)")}
                     margin="normal"
                     fullWidth
                     InputLabelProps={{ shrink: true }}

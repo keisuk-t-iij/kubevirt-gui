@@ -7,6 +7,7 @@ const baseDataProvider = simpleRestDataProvider(API_URL);
 const MOCK_VMS_KEY = "mock_virtual_machines";
 const MOCK_UDNS_KEY = "mock_user_defined_networks";
 const MOCK_CUDNS_KEY = "mock_cluster_user_defined_networks";
+const MOCK_VM_CLUSTER_INSTANCETYPES_KEY = "mock_vm_cluster_instancetypes";
 
 // Initialize mock data for VirtualMachines if empty
 if (!localStorage.getItem(MOCK_VMS_KEY)) {
@@ -124,6 +125,15 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
     localStorage.setItem(MOCK_CUDNS_KEY, JSON.stringify(initialData));
 }
 
+if (!localStorage.getItem(MOCK_VM_CLUSTER_INSTANCETYPES_KEY)) {
+    const initialData = [
+        { id: "u1.small", metadata: { name: "u1.small" } },
+        { id: "u1.medium", metadata: { name: "u1.medium" } },
+        { id: "u1.large", metadata: { name: "u1.large" } },
+    ];
+    localStorage.setItem(MOCK_VM_CLUSTER_INSTANCETYPES_KEY, JSON.stringify(initialData));
+}
+
 const getMockData = (key: string) => JSON.parse(localStorage.getItem(key) || "[]");
 const setMockData = (key: string, data: any[]) => localStorage.setItem(key, JSON.stringify(data));
 
@@ -186,6 +196,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "virtual_machines") return handleGetList(resource, MOCK_VMS_KEY);
         if (resource === "user_defined_networks") return handleGetList(resource, MOCK_UDNS_KEY);
         if (resource === "cluster_user_defined_networks") return handleGetList(resource, MOCK_CUDNS_KEY);
+        if (resource === "virtual_machine_cluster_instancetypes") return handleGetList(resource, MOCK_VM_CLUSTER_INSTANCETYPES_KEY);
 
         return baseDataProvider.getList({ resource, pagination, filters, sorters, meta });
     },
@@ -222,3 +233,7 @@ export const customDataProvider: DataProvider = {
 
     getApiUrl: () => API_URL,
 };
+
+
+
+
