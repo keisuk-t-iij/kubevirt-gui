@@ -23,18 +23,6 @@ import { customDataProvider } from "./providers/custom-data-provider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
-import {
   UserDefinedNetworkList,
   UserDefinedNetworkCreate,
   UserDefinedNetworkEdit,
