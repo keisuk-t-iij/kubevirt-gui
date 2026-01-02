@@ -127,7 +127,7 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
 const getMockData = (key: string) => JSON.parse(localStorage.getItem(key) || "[]");
 const setMockData = (key: string, data: any[]) => localStorage.setItem(key, JSON.stringify(data));
 
-const handleGetList = (resource: string, key: string) => {
+const handleGetList = (_resource: string, key: string) => {
     const data = getMockData(key);
     return {
         data,
@@ -135,7 +135,7 @@ const handleGetList = (resource: string, key: string) => {
     };
 };
 
-const handleGetOne = (resource: string, key: string, id: any) => {
+const handleGetOne = (_resource: string, key: string, id: any) => {
     const data = getMockData(key);
     const item = data.find((item: any) => item.id == id);
     return {
@@ -157,7 +157,7 @@ const handleCreate = (resource: string, key: string, variables: any) => {
     } as any;
 };
 
-const handleUpdate = (resource: string, key: string, id: any, variables: any) => {
+const handleUpdate = (_resource: string, key: string, id: any, variables: any) => {
     const data = getMockData(key);
     const index = data.findIndex((item: any) => item.id == id);
     if (index !== -1) {
@@ -170,7 +170,7 @@ const handleUpdate = (resource: string, key: string, id: any, variables: any) =>
     return { data: {} }; // Fallback
 };
 
-const handleDeleteOne = (resource: string, key: string, id: any) => {
+const handleDeleteOne = (_resource: string, key: string, id: any) => {
     const data = getMockData(key);
     const newData = data.filter((item: any) => item.id != id);
     setMockData(key, newData);

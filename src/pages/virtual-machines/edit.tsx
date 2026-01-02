@@ -6,7 +6,7 @@ export const VirtualMachineEdit = () => {
     const {
         saveButtonProps,
         refineCore: { queryResult }
-    } = useForm({} as any);
+    } = useForm({} as any) as any;
 
     const record = queryResult?.data?.data;
 

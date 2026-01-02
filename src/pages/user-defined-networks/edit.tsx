@@ -8,7 +8,7 @@ export const UserDefinedNetworkEdit = () => {
         register,
         formState: { errors },
         refineCore: { queryResult }
-    } = useForm({} as any);
+    } = useForm({} as any) as any;
 
     // Note: In a real scenario, editing a UDN might be restricted or require complex handling.
     // For this prototype, we'll just allow viewing/editing basic fields but acknowledge that 

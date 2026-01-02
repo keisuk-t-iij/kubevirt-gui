@@ -1,6 +1,9 @@
 import { Create } from "@refinedev/mui";
-import { Box, TextField, MenuItem, Select, FormControl, InputLabel, FormHelperText, Typography, Divider } from "@mui/material";
+import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, Button, IconButton, Stack } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
+import { useFieldArray } from "react-hook-form";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 interface VirtualMachineFormValues {
     metadata: {
@@ -9,7 +12,7 @@ interface VirtualMachineFormValues {
     };
     instancetype: string;
     networkPattern: "Default" | "DefaultSecondary" | "Primary" | "PrimarySecondary";
-    secondaryNetworkName?: string;
+    secondaryNetworks?: { name: string }[];
     containerDiskImage: string;
     containerDiskName: string;
 }
@@ -19,10 +22,21 @@ export const VirtualMachineCreate = () => {
         saveButtonProps,
         refineCore: { onFinish },
         register,
+        control,
         formState: { errors },
         handleSubmit,
         watch
-    } = useForm<VirtualMachineFormValues, any, VirtualMachineFormValues>();
+    } = useForm<VirtualMachineFormValues, any, VirtualMachineFormValues>({
+        defaultValues: {
+            networkPattern: "Default",
+            secondaryNetworks: [{ name: "" }]
+        }
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "secondaryNetworks"
+    });
 
     const networkPattern = watch("networkPattern", "Default");
 
@@ -59,28 +73,34 @@ export const VirtualMachineCreate = () => {
         const interfaces = [];
         const networks = [];
 
+        // Helper to add secondary networks
+        const addSecondaryNetworks = () => {
+            if (data.secondaryNetworks && data.secondaryNetworks.length > 0) {
+                data.secondaryNetworks.forEach((net, index) => {
+                    const ifaceName = `secondary-${index}`;
+                    interfaces.push({ name: ifaceName, bridge: {} });
+                    networks.push({
+                        name: ifaceName,
+                        multus: { networkName: net.name }
+                    });
+                });
+            }
+        };
+
         if (data.networkPattern === "Default") {
             interfaces.push({ name: "default", masquerade: {} });
             networks.push({ name: "default", pod: {} });
         } else if (data.networkPattern === "DefaultSecondary") {
             interfaces.push({ name: "default", masquerade: {} });
-            interfaces.push({ name: "secondary", bridge: {} });
             networks.push({ name: "default", pod: {} });
-            networks.push({
-                name: "secondary",
-                multus: { networkName: data.secondaryNetworkName }
-            });
+            addSecondaryNetworks();
         } else if (data.networkPattern === "Primary") {
             interfaces.push({ name: "primary", masquerade: {} });
             networks.push({ name: "primary", pod: {} });
         } else if (data.networkPattern === "PrimarySecondary") {
-            interfaces.push({ name: "default", masquerade: {} }); // Note: Design uses 'default' here
-            interfaces.push({ name: "secondary", bridge: {} });
+            interfaces.push({ name: "default", masquerade: {} }); // Note: Design uses 'default' here for Primary
             networks.push({ name: "default", pod: {} });
-            networks.push({
-                name: "secondary",
-                multus: { networkName: data.secondaryNetworkName }
-            });
+            addSecondaryNetworks();
         }
 
         resource.spec.template.spec.domain.devices.interfaces = interfaces;
@@ -152,15 +172,32 @@ export const VirtualMachineCreate = () => {
                 </FormControl>
 
                 {(networkPattern === "DefaultSecondary" || networkPattern === "PrimarySecondary") && (
-                    <TextField
-                        {...register("secondaryNetworkName", { required: "Secondary Network Name is required for this pattern" })}
-                        error={!!errors.secondaryNetworkName}
-                        helperText={errors.secondaryNetworkName?.message as string}
-                        label="Secondary UserDefinedNetwork Name (namespace/name)"
-                        placeholder="namespace/name"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, border: '1px dashed grey', p: 2, borderRadius: 1 }}>
+                        <Typography variant="subtitle1">Secondary Networks</Typography>
+                        {fields.map((field: any, index: number) => (
+                            <Stack key={field.id} direction="row" spacing={2} alignItems="center">
+                                <TextField
+                                    {...register(`secondaryNetworks.${index}.name`, { required: "Secondary Network Name is required" })}
+                                    error={!!errors.secondaryNetworks?.[index]?.name}
+                                    helperText={errors.secondaryNetworks?.[index]?.name?.message as string}
+                                    label={`Secondary Network ${index + 1} (namespace/name)`}
+                                    placeholder="namespace/name"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                                <IconButton onClick={() => remove(index)} disabled={fields.length === 1} color="error">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Stack>
+                        ))}
+                        <Button
+                            startIcon={<AddIcon />}
+                            onClick={() => append({ name: "" })}
+                            variant="outlined"
+                        >
+                            Add Secondary Network
+                        </Button>
+                    </Box>
                 )}
 
                 <Divider />
