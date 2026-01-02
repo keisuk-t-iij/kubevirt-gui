@@ -14,14 +14,28 @@ interface VirtualMachineFormValues {
     instancetype: string;
     networkPattern: "Default" | "DefaultSecondary" | "Primary" | "PrimarySecondary";
     secondaryNetworks?: { name: string }[];
-    // Volume Configuration
+    // Volume Configuration (OS)
     volumeType: "containerDisk" | "dataVolume";
     // ContainerDisk fields
     containerDiskImage?: string;
     containerDiskName?: string;
     // DataVolume fields
     dataVolumeName?: string;
-    dataVolumeVolumeName?: string; // The name of the volume in VM spec
+    dataVolumeVolumeName?: string;
+    // Additional Data Volumes
+    additionalVolumes?: {
+        name: string;
+        type: "cloudInitNoCloud" | "persistentVolumeClaim" | "configMap" | "secret";
+        // cloudInitNoCloud fields
+        cloudInitUserDataBase64?: string;
+        cloudInitNetworkDataBase64?: string;
+        // persistentVolumeClaim fields
+        pvcClaimName?: string;
+        // configMap fields
+        configMapName?: string;
+        // secret fields
+        secretName?: string;
+    }[];
 }
 
 export const VirtualMachineCreate = () => {
@@ -37,13 +51,19 @@ export const VirtualMachineCreate = () => {
         defaultValues: {
             networkPattern: "Default",
             secondaryNetworks: [{ name: "" }],
-            volumeType: "containerDisk"
+            volumeType: "containerDisk",
+            additionalVolumes: []
         }
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields: secondaryNetworkFields, append: appendSecondaryNetwork, remove: removeSecondaryNetwork } = useFieldArray({
         control,
         name: "secondaryNetworks"
+    });
+
+    const { fields: additionalVolumeFields, append: appendAdditionalVolume, remove: removeAdditionalVolume } = useFieldArray({
+        control,
+        name: "additionalVolumes"
     });
 
     const { options: instanceTypeOptions } = useSelect({
@@ -66,6 +86,7 @@ export const VirtualMachineCreate = () => {
 
     const networkPattern = watch("networkPattern", "Default");
     const volumeType = watch("volumeType", "containerDisk");
+    const additionalVolumes = watch("additionalVolumes");
 
     const onFinishHandler = (data: VirtualMachineFormValues) => {
         const resource: any = {
@@ -85,9 +106,9 @@ export const VirtualMachineCreate = () => {
                         domain: {
                             devices: {
                                 interfaces: [],
-                                // disks omitted for containerDisk as per design
+                                disks: [],
                             },
-                            resources: {} // Empty as per design
+                            resources: {}
                         },
                         networks: [],
                         volumes: []
@@ -135,23 +156,69 @@ export const VirtualMachineCreate = () => {
 
         // Volume Configuration
         const volumes = [];
+        const disks = [];
+
+        // 1. OS Volume
         if (data.volumeType === "containerDisk") {
+            const volName = data.containerDiskName || "containerdisk-0";
             volumes.push({
-                name: data.containerDiskName || "containerdisk-0",
+                name: volName,
                 containerDisk: {
                     image: data.containerDiskImage
                 }
             });
+            disks.push({
+                name: volName,
+                disk: { bus: "virtio" }
+            });
         } else if (data.volumeType === "dataVolume") {
+            const volName = data.dataVolumeVolumeName || "datavolume-0";
             volumes.push({
-                name: data.dataVolumeVolumeName || "datavolume-0",
+                name: volName,
                 dataVolume: {
                     name: data.dataVolumeName
                 }
             });
+            disks.push({
+                name: volName,
+                disk: { bus: "virtio" }
+            });
+        }
+
+        // 2. Additional Volumes
+        if (data.additionalVolumes) {
+            data.additionalVolumes.forEach((vol) => {
+                const volConfig: any = { name: vol.name };
+
+                if (vol.type === "cloudInitNoCloud") {
+                    volConfig.cloudInitNoCloud = {
+                        userDataBase64: vol.cloudInitUserDataBase64,
+                        networkDataBase64: vol.cloudInitNetworkDataBase64
+                    };
+                } else if (vol.type === "persistentVolumeClaim") {
+                    volConfig.persistentVolumeClaim = {
+                        claimName: vol.pvcClaimName
+                    };
+                } else if (vol.type === "configMap") {
+                    volConfig.configMap = {
+                        name: vol.configMapName
+                    };
+                } else if (vol.type === "secret") {
+                    volConfig.secret = {
+                        secretName: vol.secretName
+                    };
+                }
+
+                volumes.push(volConfig);
+                disks.push({
+                    name: vol.name,
+                    disk: { bus: "virtio" }
+                });
+            });
         }
 
         resource.spec.template.spec.volumes = volumes;
+        resource.spec.template.spec.domain.devices.disks = disks;
 
         onFinish(resource);
     };
@@ -221,7 +288,7 @@ export const VirtualMachineCreate = () => {
                 {(networkPattern === "DefaultSecondary" || networkPattern === "PrimarySecondary") && (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, border: '1px dashed grey', p: 2, borderRadius: 1 }}>
                         <Typography variant="subtitle1">Secondary Networks</Typography>
-                        {fields.map((field: any, index: number) => (
+                        {secondaryNetworkFields.map((field: any, index: number) => (
                             <Stack key={field.id} direction="row" spacing={2} alignItems="center">
                                 <FormControl fullWidth>
                                     <InputLabel id={`secondary-network-label-${index}`}>Secondary Network {index + 1}</InputLabel>
@@ -238,14 +305,14 @@ export const VirtualMachineCreate = () => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                                <IconButton onClick={() => remove(index)} disabled={fields.length === 1} color="error">
+                                <IconButton onClick={() => removeSecondaryNetwork(index)} disabled={secondaryNetworkFields.length === 1} color="error">
                                     <DeleteIcon />
                                 </IconButton>
                             </Stack>
                         ))}
                         <Button
                             startIcon={<AddIcon />}
-                            onClick={() => append({ name: "" })}
+                            onClick={() => appendSecondaryNetwork({ name: "" })}
                             variant="outlined"
                         >
                             Add Secondary Network
@@ -254,7 +321,7 @@ export const VirtualMachineCreate = () => {
                 )}
 
                 <Divider />
-                <Typography variant="h6">Volume Configuration</Typography>
+                <Typography variant="h6">OS Volume Configuration</Typography>
 
                 <FormControl fullWidth>
                     <InputLabel id="volume-type-label">Volume Type</InputLabel>
@@ -324,6 +391,100 @@ export const VirtualMachineCreate = () => {
                         </FormControl>
                     </Box>
                 )}
+
+                <Divider />
+                <Typography variant="h6">Additional Data Volumes</Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, border: '1px dashed grey', p: 2, borderRadius: 1 }}>
+                    {additionalVolumeFields.map((field: any, index: number) => (
+                        <Box key={field.id} sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1, position: 'relative' }}>
+                            <IconButton
+                                onClick={() => removeAdditionalVolume(index)}
+                                color="error"
+                                sx={{ position: 'absolute', top: 8, right: 8 }}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                            <Stack spacing={2}>
+                                <Typography variant="subtitle2">Volume {index + 1}</Typography>
+                                <TextField
+                                    {...register(`additionalVolumes.${index}.name`, { required: "Volume Name is required" })}
+                                    label="Volume Name"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                                <FormControl fullWidth>
+                                    <InputLabel>Volume Type</InputLabel>
+                                    <Select
+                                        {...register(`additionalVolumes.${index}.type`, { required: "Type is required" })}
+                                        defaultValue="persistentVolumeClaim"
+                                        label="Volume Type"
+                                    >
+                                        <MenuItem value="cloudInitNoCloud">cloudInitNoCloud</MenuItem>
+                                        <MenuItem value="persistentVolumeClaim">persistentVolumeClaim</MenuItem>
+                                        <MenuItem value="configMap">configMap</MenuItem>
+                                        <MenuItem value="secret">secret</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                {additionalVolumes && additionalVolumes[index]?.type === "cloudInitNoCloud" && (
+                                    <>
+                                        <TextField
+                                            {...register(`additionalVolumes.${index}.cloudInitUserDataBase64`)}
+                                            label="User Data (Base64)"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                        <TextField
+                                            {...register(`additionalVolumes.${index}.cloudInitNetworkDataBase64`)}
+                                            label="Network Data (Base64)"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    </>
+                                )}
+
+                                {additionalVolumes && additionalVolumes[index]?.type === "persistentVolumeClaim" && (
+                                    <TextField
+                                        {...register(`additionalVolumes.${index}.pvcClaimName`, { required: "Claim Name is required" })}
+                                        label="Claim Name"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                )}
+
+                                {additionalVolumes && additionalVolumes[index]?.type === "configMap" && (
+                                    <TextField
+                                        {...register(`additionalVolumes.${index}.configMapName`, { required: "ConfigMap Name is required" })}
+                                        label="ConfigMap Name"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                )}
+
+                                {additionalVolumes && additionalVolumes[index]?.type === "secret" && (
+                                    <TextField
+                                        {...register(`additionalVolumes.${index}.secretName`, { required: "Secret Name is required" })}
+                                        label="Secret Name"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                )}
+                            </Stack>
+                        </Box>
+                    ))}
+                    <Button
+                        startIcon={<AddIcon />}
+                        onClick={() => appendAdditionalVolume({ name: "", type: "persistentVolumeClaim" })}
+                        variant="outlined"
+                    >
+                        Add Data Volume
+                    </Button>
+                </Box>
 
             </Box>
         </Create>
