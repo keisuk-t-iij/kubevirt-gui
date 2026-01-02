@@ -1,55 +1,62 @@
 import { useShow, IResourceComponentsProps } from "@refinedev/core";
-import {
-    Show,
-    TextFieldComponent,
-} from "@refinedev/mui";
-import { Typography, Stack } from "@mui/material";
+import { Show } from "@refinedev/mui";
+import { Typography, Box, IconButton, Tooltip, Snackbar, Alert } from "@mui/material";
+import { dump } from "js-yaml";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useState } from "react";
 
 export const DataVolumeShow: React.FC<IResourceComponentsProps> = () => {
-    const { queryResult } = useShow() as any;
-    const { data, isLoading } = queryResult;
+    const showResult = useShow();
+    const { query } = showResult;
+    const { data, isLoading } = query || {};
+    const [open, setOpen] = useState(false);
 
     const record = data?.data;
 
+    let yamlContent = "";
+    try {
+        if (record) {
+            yamlContent = dump(record);
+        } else {
+            yamlContent = "No record found.";
+        }
+    } catch (error) {
+        console.error("YAML Dump Error:", error);
+        yamlContent = "Error parsing YAML.";
+    }
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(yamlContent);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!record) return <div>No Record Found</div>;
+
     return (
-        <Show isLoading={isLoading}>
-            <Stack gap={1}>
-                <Typography variant="body1" fontWeight="bold">
-                    ID
-                </Typography>
-                <TextFieldComponent value={record?.id} />
-
-                <Typography variant="body1" fontWeight="bold">
-                    Name
-                </Typography>
-                <TextFieldComponent value={record?.metadata?.name} />
-
-                <Typography variant="body1" fontWeight="bold">
-                    Namespace
-                </Typography>
-                <TextFieldComponent value={record?.metadata?.namespace} />
-
-                <Typography variant="body1" fontWeight="bold">
-                    Storage Size
-                </Typography>
-                <TextFieldComponent value={record?.spec?.pvc?.resources?.requests?.storage} />
-
-                <Typography variant="body1" fontWeight="bold">
-                    Source
-                </Typography>
-                {record?.spec?.source?.http && (
-                    <Stack direction="row" spacing={1}>
-                        <Typography variant="body2" fontWeight="bold">HTTP URL:</Typography>
-                        <TextFieldComponent value={record?.spec.source.http.url} />
-                    </Stack>
-                )}
-                {record?.spec?.source?.pvc && (
-                    <Stack direction="row" spacing={1}>
-                        <Typography variant="body2" fontWeight="bold">PVC Name:</Typography>
-                        <TextFieldComponent value={record?.spec.source.pvc.name} />
-                    </Stack>
-                )}
-            </Stack>
+        <Show isLoading={isLoading} title={<Typography variant="h5">DataVolume YAML</Typography>}>
+            <Box sx={{ position: "relative", bgcolor: "#f5f5f5", p: 2, borderRadius: 1, overflow: "auto" }}>
+                <Tooltip title="Copy to Clipboard">
+                    <IconButton
+                        onClick={handleCopy}
+                        sx={{ position: "absolute", top: 8, right: 8 }}
+                    >
+                        <ContentCopyIcon />
+                    </IconButton>
+                </Tooltip>
+                <pre style={{ margin: 0, fontFamily: "monospace" }}>
+                    {yamlContent}
+                </pre>
+            </Box>
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+                    Copied to clipboard!
+                </Alert>
+            </Snackbar>
         </Show>
     );
 };

@@ -51,7 +51,6 @@ export const UserDefinedNetworkCreate = () => {
             resource.spec.topology = "Layer3";
             resource.spec.layer3 = {
                 role: "Primary",
-                subnets: [data.subnet],
                 ipam: {
                     mode: "Enabled",
                     lifecycle: "Persistent"

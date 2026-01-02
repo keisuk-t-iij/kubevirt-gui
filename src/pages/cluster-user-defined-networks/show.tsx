@@ -1,57 +1,62 @@
 import { Show } from "@refinedev/mui";
-import { Typography, Stack } from "@mui/material";
+import { Typography, Box, IconButton, Tooltip, Snackbar, Alert } from "@mui/material";
 import { useShow } from "@refinedev/core";
+import { dump } from "js-yaml";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useState } from "react";
 
 export const ClusterUserDefinedNetworkShow = () => {
-    const { queryResult } = useShow() as any;
-    const { data, isLoading } = queryResult;
+    const showResult = useShow();
+    const { query } = showResult;
+    const { data, isLoading } = query || {};
+    const [open, setOpen] = useState(false);
 
     const record = data?.data;
 
-    if (isLoading) return <div>Loading...</div>;
+    let yamlContent = "";
+    try {
+        if (record) {
+            yamlContent = dump(record);
+        } else {
+            yamlContent = "No record found.";
+        }
+    } catch (error) {
+        console.error("YAML Dump Error:", error);
+        yamlContent = "Error parsing YAML.";
+    }
 
-    const topology = record?.spec?.network?.topology;
-    // CUDN can be Layer2 or Localnet
-    const networkSpec = topology === "Localnet" ? record?.spec?.network?.localnet : record?.spec?.network?.layer2;
+    const handleCopy = () => {
+        navigator.clipboard.writeText(yamlContent);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!record) return <div>No Record Found</div>;
 
     return (
-        <Show isLoading={isLoading}>
-            <Stack gap={1}>
-                <Typography variant="body1" fontWeight="bold">
-                    Name
-                </Typography>
-                <Typography variant="body2">
-                    {record?.metadata?.name}
-                </Typography>
-
-                <Typography variant="body1" fontWeight="bold">
-                    Topology
-                </Typography>
-                <Typography variant="body2">
-                    {topology}
-                </Typography>
-
-                <Typography variant="body1" fontWeight="bold">
-                    Role
-                </Typography>
-                <Typography variant="body2">
-                    {networkSpec?.role}
-                </Typography>
-
-                <Typography variant="body1" fontWeight="bold">
-                    Subnets
-                </Typography>
-                <Typography variant="body2">
-                    {networkSpec?.subnets?.join(", ") || "None"}
-                </Typography>
-
-                <Typography variant="body1" fontWeight="bold">
-                    Target Namespaces
-                </Typography>
-                <Typography variant="body2">
-                    {record?.spec?.namespaceSelector?.matchExpressions?.[0]?.values?.join(", ") || "All/None"}
-                </Typography>
-            </Stack>
+        <Show isLoading={isLoading} title={<Typography variant="h5">ClusterUserDefinedNetwork YAML</Typography>}>
+            <Box sx={{ position: "relative", bgcolor: "#f5f5f5", p: 2, borderRadius: 1, overflow: "auto" }}>
+                <Tooltip title="Copy to Clipboard">
+                    <IconButton
+                        onClick={handleCopy}
+                        sx={{ position: "absolute", top: 8, right: 8 }}
+                    >
+                        <ContentCopyIcon />
+                    </IconButton>
+                </Tooltip>
+                <pre style={{ margin: 0, fontFamily: "monospace" }}>
+                    {yamlContent}
+                </pre>
+            </Box>
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+                    Copied to clipboard!
+                </Alert>
+            </Snackbar>
         </Show>
     );
 };

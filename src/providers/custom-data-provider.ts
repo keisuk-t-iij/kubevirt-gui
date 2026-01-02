@@ -77,7 +77,6 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
             spec: {
                 layer3: {
                     role: "Primary",
-                    subnets: ["10.1.0.0/24"],
                     ipam: { mode: "Enabled", lifecycle: "Persistent" }
                 },
                 topology: "Layer3"
