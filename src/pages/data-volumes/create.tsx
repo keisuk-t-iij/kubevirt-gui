@@ -1,6 +1,7 @@
 import { Create } from "@refinedev/mui";
-import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider } from "@mui/material";
+import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, FormHelperText } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
+import { useSelect } from "@refinedev/core";
 
 interface DataVolumeFormValues {
     metadata: {
@@ -29,6 +30,12 @@ export const DataVolumeCreate = () => {
     });
 
     const sourceType = watch("sourceType", "http");
+
+    const { options: dataVolumeOptions } = useSelect({
+        resource: "data_volumes",
+        optionLabel: "metadata.name",
+        optionValue: "metadata.name",
+    });
 
     const onFinishHandler = (data: DataVolumeFormValues) => {
         const resource: any = {
@@ -107,7 +114,7 @@ export const DataVolumeCreate = () => {
                         label="Source Type"
                     >
                         <MenuItem value="http">HTTP (URL)</MenuItem>
-                        <MenuItem value="pvc">PVC (Existing PVC)</MenuItem>
+                        <MenuItem value="pvc">PVC (Existing DataVolume)</MenuItem>
                     </Select>
                 </FormControl>
 
@@ -124,15 +131,25 @@ export const DataVolumeCreate = () => {
                 )}
 
                 {sourceType === "pvc" && (
-                    <TextField
-                        {...register("pvcName", { required: "PVC Name is required for PVC source" })}
-                        error={!!errors.pvcName}
-                        helperText={errors.pvcName?.message as string}
-                        label="PVC Name"
-                        placeholder="existing-pvc-name"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="pvc-select-label">Select Source DataVolume</InputLabel>
+                        <Select
+                            labelId="pvc-select-label"
+                            {...register("pvcName", { required: "Source DataVolume is required" })}
+                            label="Select Source DataVolume"
+                            defaultValue=""
+                            error={!!errors.pvcName}
+                        >
+                            {dataVolumeOptions.map((option: any) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {errors.pvcName && (
+                            <FormHelperText error>{errors.pvcName.message as string}</FormHelperText>
+                        )}
+                    </FormControl>
                 )}
 
             </Box>
