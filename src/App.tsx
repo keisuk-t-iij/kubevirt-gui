@@ -73,23 +73,25 @@ function App() {
                 routerProvider={routerProvider}
                 resources={[
                   {
-                    name: "blog_posts",
-                    list: "/blog-posts",
-                    create: "/blog-posts/create",
-                    edit: "/blog-posts/edit/:id",
-                    show: "/blog-posts/show/:id",
+                    name: "virtual_machines",
+                    list: "/virtual-machines",
+                    create: "/virtual-machines/create",
+                    edit: "/virtual-machines/edit/:id",
+                    show: "/virtual-machines/show/:id",
                     meta: {
                       canDelete: true,
+                      label: "Virtual Machines",
                     },
                   },
                   {
-                    name: "categories",
-                    list: "/categories",
-                    create: "/categories/create",
-                    edit: "/categories/edit/:id",
-                    show: "/categories/show/:id",
+                    name: "data_volumes",
+                    list: "/data-volumes",
+                    create: "/data-volumes/create",
+                    edit: "/data-volumes/edit/:id",
+                    show: "/data-volumes/show/:id",
                     meta: {
                       canDelete: true,
+                      label: "Data Volumes",
                     },
                   },
                   {
@@ -112,28 +114,6 @@ function App() {
                       label: "Cluster User Defined Networks",
                     }
                   },
-                  {
-                    name: "virtual_machines",
-                    list: "/virtual-machines",
-                    create: "/virtual-machines/create",
-                    edit: "/virtual-machines/edit/:id",
-                    show: "/virtual-machines/show/:id",
-                    meta: {
-                      canDelete: true,
-                      label: "Virtual Machines",
-                    },
-                  },
-                  {
-                    name: "data_volumes",
-                    list: "/data-volumes",
-                    create: "/data-volumes/create",
-                    edit: "/data-volumes/edit/:id",
-                    show: "/data-volumes/show/:id",
-                    meta: {
-                      canDelete: true,
-                      label: "Data Volumes",
-                    },
-                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -151,20 +131,8 @@ function App() {
                   >
                     <Route
                       index
-                      element={<NavigateToResource resource="blog_posts" />}
+                      element={<NavigateToResource resource="virtual_machines" />}
                     />
-                    <Route path="/blog-posts">
-                      <Route index element={<BlogPostList />} />
-                      <Route path="create" element={<BlogPostCreate />} />
-                      <Route path="edit/:id" element={<BlogPostEdit />} />
-                      <Route path="show/:id" element={<BlogPostShow />} />
-                    </Route>
-                    <Route path="/categories">
-                      <Route index element={<CategoryList />} />
-                      <Route path="create" element={<CategoryCreate />} />
-                      <Route path="edit/:id" element={<CategoryEdit />} />
-                      <Route path="show/:id" element={<CategoryShow />} />
-                    </Route>
                     <Route path="/user-defined-networks">
                       <Route index element={<UserDefinedNetworkList />} />
                       <Route path="create" element={<UserDefinedNetworkCreate />} />
