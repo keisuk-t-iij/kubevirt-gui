@@ -16,8 +16,10 @@ import routerProvider, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import dataProvider from "@refinedev/simple-rest";
+
+// import dataProvider from "@refinedev/simple-rest";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { customDataProvider } from "./providers/custom-data-provider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import {
@@ -32,6 +34,22 @@ import {
   CategoryList,
   CategoryShow,
 } from "./pages/categories";
+import {
+  UserDefinedNetworkList,
+  UserDefinedNetworkCreate,
+  UserDefinedNetworkEdit,
+  UserDefinedNetworkShow,
+} from "./pages/user-defined-networks";
+import {
+  ClusterUserDefinedNetworkList,
+  ClusterUserDefinedNetworkShow,
+} from "./pages/cluster-user-defined-networks";
+import {
+  VirtualMachineList,
+  VirtualMachineCreate,
+  VirtualMachineEdit,
+  VirtualMachineShow,
+} from "./pages/virtual-machines";
 
 function App() {
   return (
@@ -44,7 +62,7 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+                dataProvider={customDataProvider}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerProvider}
                 resources={[
@@ -66,6 +84,37 @@ function App() {
                     show: "/categories/show/:id",
                     meta: {
                       canDelete: true,
+                    },
+                  },
+                  {
+                    name: "user_defined_networks",
+                    list: "/user-defined-networks",
+                    create: "/user-defined-networks/create",
+                    edit: "/user-defined-networks/edit/:id",
+                    show: "/user-defined-networks/show/:id",
+                    meta: {
+                      canDelete: true,
+                      label: "User Defined Networks",
+                    },
+                  },
+                  {
+                    name: "cluster_user_defined_networks",
+                    list: "/cluster-user-defined-networks",
+                    show: "/cluster-user-defined-networks/show/:id",
+                    meta: {
+                      canDelete: false,
+                      label: "Cluster User Defined Networks",
+                    }
+                  },
+                  {
+                    name: "virtual_machines",
+                    list: "/virtual-machines",
+                    create: "/virtual-machines/create",
+                    edit: "/virtual-machines/edit/:id",
+                    show: "/virtual-machines/show/:id",
+                    meta: {
+                      canDelete: true,
+                      label: "Virtual Machines",
                     },
                   },
                 ]}
@@ -98,6 +147,22 @@ function App() {
                       <Route path="create" element={<CategoryCreate />} />
                       <Route path="edit/:id" element={<CategoryEdit />} />
                       <Route path="show/:id" element={<CategoryShow />} />
+                    </Route>
+                    <Route path="/user-defined-networks">
+                      <Route index element={<UserDefinedNetworkList />} />
+                      <Route path="create" element={<UserDefinedNetworkCreate />} />
+                      <Route path="edit/:id" element={<UserDefinedNetworkEdit />} />
+                      <Route path="show/:id" element={<UserDefinedNetworkShow />} />
+                    </Route>
+                    <Route path="/cluster-user-defined-networks">
+                      <Route index element={<ClusterUserDefinedNetworkList />} />
+                      <Route path="show/:id" element={<ClusterUserDefinedNetworkShow />} />
+                    </Route>
+                    <Route path="/virtual-machines">
+                      <Route index element={<VirtualMachineList />} />
+                      <Route path="create" element={<VirtualMachineCreate />} />
+                      <Route path="edit/:id" element={<VirtualMachineEdit />} />
+                      <Route path="show/:id" element={<VirtualMachineShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
