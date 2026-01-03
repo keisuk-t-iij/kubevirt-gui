@@ -2,12 +2,13 @@ import { Create, useAutocomplete } from "@refinedev/mui";
 import { Box, TextField, MenuItem, Select, FormControl, InputLabel, FormHelperText, Typography } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
 import { useSelect } from "@refinedev/core";
+import { useEffect } from "react";
 
 // Type definitions for form data
 interface UserDefinedNetworkFormValues {
     metadata: {
         name: string;
-        // namespace is usually handled by the provider context or user selection if multi-tenant
+        namespace: string;
     };
     networkType: "Layer2" | "Layer3";
     subnet: string;
@@ -18,11 +19,33 @@ export const UserDefinedNetworkCreate = () => {
         saveButtonProps,
         refineCore: { onFinish },
         register,
-        control,
         formState: { errors },
+        watch,
         handleSubmit,
-        watch
-    } = useForm<UserDefinedNetworkFormValues, any, UserDefinedNetworkFormValues>();
+        setValue
+    } = useForm<UserDefinedNetworkFormValues, any, UserDefinedNetworkFormValues>({
+        defaultValues: {
+            networkType: "Layer2",
+            metadata: {
+                namespace: "default"
+            }
+        }
+    });
+
+    const { query } = useSelect({
+        resource: "namespaces",
+        pagination: { mode: "off" }
+    });
+
+    const namespaceData = query?.data;
+
+    const defaultNamespaceInfo = namespaceData?.data?.find((ns: any) => ns.metadata?.annotations?.["kubevirt-gui/default-namespace"] === "true");
+
+    useEffect(() => {
+        if (defaultNamespaceInfo?.metadata?.name) {
+            setValue("metadata.namespace", defaultNamespaceInfo.metadata.name);
+        }
+    }, [defaultNamespaceInfo, setValue]);
 
     const networkType = watch("networkType", "Layer2");
 

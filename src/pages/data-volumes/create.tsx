@@ -1,7 +1,8 @@
 import { Create } from "@refinedev/mui";
 import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, FormHelperText } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
-import { useSelect } from "@refinedev/core";
+import { useSelect, useList } from "@refinedev/core";
+import { useEffect } from "react";
 
 interface DataVolumeFormValues {
     metadata: {
@@ -21,7 +22,8 @@ export const DataVolumeCreate = () => {
         register,
         formState: { errors },
         watch,
-        handleSubmit
+        handleSubmit,
+        setValue
     } = useForm<DataVolumeFormValues, any, DataVolumeFormValues>({
         defaultValues: {
             sourceType: "http",
@@ -36,6 +38,20 @@ export const DataVolumeCreate = () => {
         optionLabel: "metadata.name",
         optionValue: "metadata.name",
     });
+
+    const { query } = useSelect({
+        resource: "namespaces",
+        pagination: { mode: "off" }
+    });
+    const namespaceData = query?.data;
+
+    const defaultNamespaceInfo = namespaceData?.data?.find((ns: any) => ns.metadata?.annotations?.["kubevirt-gui/default-namespace"] === "true");
+
+    useEffect(() => {
+        if (defaultNamespaceInfo?.metadata?.name) {
+            setValue("metadata.namespace", defaultNamespaceInfo.metadata.name);
+        }
+    }, [defaultNamespaceInfo, setValue]);
 
     const onFinishHandler = (data: DataVolumeFormValues) => {
         const resource: any = {

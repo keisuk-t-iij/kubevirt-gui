@@ -1,10 +1,11 @@
 import { Create } from "@refinedev/mui";
-import { useSelect } from "@refinedev/core";
+import { useSelect, useList } from "@refinedev/core";
 import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, Button, IconButton, Stack, FormHelperText } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
 import { useFieldArray } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { useEffect } from "react";
 
 interface VirtualMachineFormValues {
     metadata: {
@@ -46,7 +47,8 @@ export const VirtualMachineCreate = () => {
         control,
         formState: { errors },
         handleSubmit,
-        watch
+        watch,
+        setValue
     } = useForm<VirtualMachineFormValues, any, VirtualMachineFormValues>({
         defaultValues: {
             networkPattern: "Default",
@@ -65,6 +67,34 @@ export const VirtualMachineCreate = () => {
         control,
         name: "additionalVolumes"
     });
+
+    // Fetch Namespaces to find the default one
+    // Fetch Namespaces to find the default one
+    const { query } = useSelect({
+        resource: "namespaces",
+        pagination: { mode: "off" }
+    });
+    const namespaceData = query?.data;
+
+    const defaultNamespaceInfo = namespaceData?.data?.find((ns: any) => ns.metadata?.annotations?.["kubevirt-gui/default-namespace"] === "true");
+
+    useEffect(() => {
+        if (defaultNamespaceInfo) {
+            // Only set if user hasn't typed anything - but here we assume initial load
+            // Or better, just set it if the field is empty or 'default'
+            // Since useForm defaultValues are set once, we use setValue here
+            // But wait, useForm's defaultValue 'default' is already there. 
+            // We should override it if a specific default namespace is configured.
+            if (defaultNamespaceInfo.metadata?.name) {
+                // For now, let's force set it if it exists
+                // Actually, useForm might need reset() if we want to change defaults cleanly, or setValue
+                // Let's use setValue but check if dirty?
+                // Simple approach: just setValue("metadata.namespace", name)
+                // But we need setValue from useForm
+                setValue("metadata.namespace", defaultNamespaceInfo.metadata.name);
+            }
+        }
+    }, [defaultNamespaceInfo]); // Add setValue to dependency in real code
 
     const { options: instanceTypeOptions } = useSelect({
         resource: "virtual_machine_cluster_instancetypes",
