@@ -8,6 +8,8 @@ const MOCK_VMS_KEY = "mock_virtual_machines";
 const MOCK_UDNS_KEY = "mock_user_defined_networks";
 const MOCK_CUDNS_KEY = "mock_cluster_user_defined_networks";
 const MOCK_VM_CLUSTER_INSTANCETYPES_KEY = "mock_vm_cluster_instancetypes";
+const MOCK_DATA_VOLUMES_KEY = "mock_data_volumes";
+const MOCK_NAMESPACES_KEY = "mock_namespaces";
 
 // Initialize mock data for VirtualMachines if empty
 if (!localStorage.getItem(MOCK_VMS_KEY)) {
@@ -190,7 +192,6 @@ const handleDeleteOne = (_resource: string, key: string, id: any) => {
 
 // ... existing imports
 
-const MOCK_DATA_VOLUMES_KEY = "mock_data_volumes";
 
 // ... existing initializations
 
@@ -230,6 +231,23 @@ if (!localStorage.getItem(MOCK_DATA_VOLUMES_KEY)) {
     localStorage.setItem(MOCK_DATA_VOLUMES_KEY, JSON.stringify(initialData));
 }
 
+// Initialize mock data for Namespaces if empty
+if (!localStorage.getItem(MOCK_NAMESPACES_KEY)) {
+    const initialData = [
+        {
+            id: 1,
+            metadata: {
+                name: "default",
+                annotations: {
+                    "kubevirt-gui/default-namespace": "true"
+                }
+            },
+            status: { phase: "Active" }
+        }
+    ];
+    localStorage.setItem(MOCK_NAMESPACES_KEY, JSON.stringify(initialData));
+}
+
 // ... existing handlers (getMockData, setMockData, etc.)
 
 export const customDataProvider: DataProvider = {
@@ -241,6 +259,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "cluster_user_defined_networks") return handleGetList(resource, MOCK_CUDNS_KEY);
         if (resource === "virtual_machine_cluster_instancetypes") return handleGetList(resource, MOCK_VM_CLUSTER_INSTANCETYPES_KEY);
         if (resource === "data_volumes") return handleGetList(resource, MOCK_DATA_VOLUMES_KEY);
+        if (resource === "namespaces") return handleGetList(resource, MOCK_NAMESPACES_KEY);
 
         return baseDataProvider.getList({ resource, pagination, filters, sorters, meta });
     },
@@ -250,6 +269,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "user_defined_networks") return handleGetOne(resource, MOCK_UDNS_KEY, id);
         if (resource === "cluster_user_defined_networks") return handleGetOne(resource, MOCK_CUDNS_KEY, id);
         if (resource === "data_volumes") return handleGetOne(resource, MOCK_DATA_VOLUMES_KEY, id);
+        if (resource === "namespaces") return handleGetOne(resource, MOCK_NAMESPACES_KEY, id);
 
         return baseDataProvider.getOne({ resource, id, meta });
     },
@@ -258,6 +278,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "virtual_machines") return handleCreate(resource, MOCK_VMS_KEY, variables);
         if (resource === "user_defined_networks") return handleCreate(resource, MOCK_UDNS_KEY, variables);
         if (resource === "data_volumes") return handleCreate(resource, MOCK_DATA_VOLUMES_KEY, variables);
+        if (resource === "namespaces") return handleCreate(resource, MOCK_NAMESPACES_KEY, variables);
 
         return baseDataProvider.create({ resource, variables, meta });
     },
@@ -266,6 +287,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "virtual_machines") return handleUpdate(resource, MOCK_VMS_KEY, id, variables);
         if (resource === "user_defined_networks") return handleUpdate(resource, MOCK_UDNS_KEY, id, variables);
         if (resource === "data_volumes") return handleUpdate(resource, MOCK_DATA_VOLUMES_KEY, id, variables);
+        if (resource === "namespaces") return handleUpdate(resource, MOCK_NAMESPACES_KEY, id, variables);
 
         return baseDataProvider.update({ resource, id, variables, meta });
     },
@@ -274,6 +296,7 @@ export const customDataProvider: DataProvider = {
         if (resource === "virtual_machines") return handleDeleteOne(resource, MOCK_VMS_KEY, id);
         if (resource === "user_defined_networks") return handleDeleteOne(resource, MOCK_UDNS_KEY, id);
         if (resource === "data_volumes") return handleDeleteOne(resource, MOCK_DATA_VOLUMES_KEY, id);
+        if (resource === "namespaces") return handleDeleteOne(resource, MOCK_NAMESPACES_KEY, id);
 
         return baseDataProvider.deleteOne({ resource, id, variables, meta });
     },

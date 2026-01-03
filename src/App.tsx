@@ -44,6 +44,12 @@ import {
   DataVolumeEdit,
   DataVolumeShow,
 } from "./pages/data-volumes";
+import {
+  NamespaceList,
+  NamespaceCreate,
+  NamespaceEdit,
+  NamespaceShow,
+} from "./pages/namespaces";
 
 function App() {
   return (
@@ -102,6 +108,17 @@ function App() {
                       label: "Cluster User Defined Networks",
                     }
                   },
+                  {
+                    name: "namespaces",
+                    list: "/namespaces",
+                    create: "/namespaces/create",
+                    edit: "/namespaces/edit/:id",
+                    show: "/namespaces/show/:id",
+                    meta: {
+                      canDelete: true,
+                      label: "Namespaces",
+                    }
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -142,6 +159,12 @@ function App() {
                       <Route path="create" element={<DataVolumeCreate />} />
                       <Route path="edit/:id" element={<DataVolumeEdit />} />
                       <Route path="show/:id" element={<DataVolumeShow />} />
+                    </Route>
+                    <Route path="/namespaces">
+                      <Route index element={<NamespaceList />} />
+                      <Route path="create" element={<NamespaceCreate />} />
+                      <Route path="edit/:id" element={<NamespaceEdit />} />
+                      <Route path="show/:id" element={<NamespaceShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
