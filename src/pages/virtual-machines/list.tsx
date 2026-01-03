@@ -18,6 +18,16 @@ interface VMRow {
             name: string;
         };
         runStrategy: string;
+        template?: {
+            spec?: {
+                networks?: {
+                    name: string;
+                    multus?: {
+                        networkName: string;
+                    };
+                }[];
+            };
+        };
     };
     status: {
         printableStatus: string;
@@ -38,6 +48,7 @@ export const VirtualMachineList = () => {
             field: "metadata.name",
             headerName: "Name",
             minWidth: 150,
+            flex: 1,
             valueGetter: (_value, row) => {
                 return (row as VMRow)?.metadata?.name;
             }
@@ -51,20 +62,46 @@ export const VirtualMachineList = () => {
             }
         },
         {
+            field: "spec.instancetype.name",
+            headerName: "Instance Type",
+            minWidth: 150,
+            valueGetter: (_value, row) => {
+                return (row as VMRow)?.spec?.instancetype?.name;
+            }
+        },
+        {
+            field: "metadata.annotations.kubevirt-gui/network-pattern",
+            headerName: "Network Config",
+            minWidth: 150,
+            valueGetter: (_value, row) => {
+                return (row as any)?.metadata?.annotations?.["kubevirt-gui/network-pattern"] || "Custom/Unknown";
+            }
+        },
+        {
+            field: "secondaryNetworks",
+            headerName: "Secondary Networks",
+            minWidth: 200,
+            valueGetter: (_value, row) => {
+                const networkPattern = (row as any)?.metadata?.annotations?.["kubevirt-gui/network-pattern"];
+                if (networkPattern === "DefaultSecondary" || networkPattern === "PrimarySecondary") {
+                    const networks = (row as VMRow)?.spec?.template?.spec?.networks;
+                    if (networks) {
+                        return networks
+                            .filter(n => n.multus?.networkName)
+                            .map(n => n.multus?.networkName)
+                            .join(", ");
+                    }
+                }
+                return "";
+            }
+        },
+        {
             field: "status.printableStatus",
             headerName: "Status",
             minWidth: 120,
             valueGetter: (_value, row) => {
                 // Determine status. Usually in status.printableStatus for VirtualMachine
                 return (row as VMRow)?.status?.printableStatus || "Unknown";
-            }
-        },
-        {
-            field: "spec.instancetype.name",
-            headerName: "Instance Type",
-            minWidth: 150,
-            valueGetter: (_value, row) => {
-                return (row as VMRow)?.spec?.instancetype?.name;
             }
         },
         {

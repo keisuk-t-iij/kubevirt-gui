@@ -21,6 +21,12 @@ export const DataVolumeList = () => {
             valueGetter: (_value, row) => row?.metadata?.name
         },
         {
+            field: "metadata.namespace",
+            headerName: "Namespace",
+            minWidth: 150,
+            valueGetter: (_value, row) => row?.metadata?.namespace || "default"
+        },
+        {
             field: "spec.source",
             headerName: "Source Type",
             minWidth: 150,
@@ -29,6 +35,16 @@ export const DataVolumeList = () => {
                 if (source?.http) return "HTTP";
                 if (source?.pvc) return "PVC";
                 return "Unknown";
+            }
+        },
+        {
+            field: "spec.source.pvc.name",
+            headerName: "Source Name",
+            minWidth: 150,
+            valueGetter: (_value, row) => {
+                const source = row?.spec?.source;
+                if (source?.pvc) return source.pvc.name;
+                return "";
             }
         },
         {

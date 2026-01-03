@@ -16,7 +16,11 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
     const initialData = [
         {
             id: 1,
-            metadata: { name: "test-vm-1", namespace: "default" },
+            metadata: {
+                name: "test-vm-1",
+                namespace: "default",
+                annotations: { "kubevirt-gui/network-pattern": "Default" }
+            },
             spec: {
                 instancetype: { name: "u1.small" },
                 runStrategy: "Always",
@@ -36,7 +40,11 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
         },
         {
             id: 2,
-            metadata: { name: "test-vm-2", namespace: "default" },
+            metadata: {
+                name: "test-vm-2",
+                namespace: "default",
+                annotations: { "kubevirt-gui/network-pattern": "Primary" }
+            },
             spec: {
                 instancetype: { name: "u1.medium" },
                 runStrategy: "Always",
@@ -56,6 +64,43 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
         }
     ];
     localStorage.setItem(MOCK_VMS_KEY, JSON.stringify(initialData));
+}
+
+// Ensure test-vm-3 exists (for Secondary Network testing)
+const existingVMs = JSON.parse(localStorage.getItem(MOCK_VMS_KEY) || "[]");
+if (!existingVMs.find((vm: any) => vm.id === 3)) {
+    const vm3 = {
+        id: 3,
+        metadata: {
+            name: "test-vm-3",
+            namespace: "default",
+            annotations: { "kubevirt-gui/network-pattern": "DefaultSecondary" }
+        },
+        spec: {
+            instancetype: { name: "u1.small" },
+            runStrategy: "Always",
+            template: {
+                spec: {
+                    domain: {
+                        devices: {
+                            interfaces: [
+                                { name: "default", masquerade: {} },
+                                { name: "secondary-0", bridge: {} }
+                            ],
+                            resources: {}
+                        }
+                    },
+                    networks: [
+                        { name: "default", pod: {} },
+                        { name: "secondary-0", multus: { networkName: "l2-network" } }
+                    ]
+                }
+            }
+        },
+        status: { printableStatus: "Running" }
+    };
+    existingVMs.push(vm3);
+    localStorage.setItem(MOCK_VMS_KEY, JSON.stringify(existingVMs));
 }
 
 // Initialize mock data for UserDefinedNetworks if empty
@@ -201,7 +246,7 @@ if (!localStorage.getItem(MOCK_DATA_VOLUMES_KEY)) {
             id: 1,
             apiVersion: "cdi.kubevirt.io/v1beta1",
             kind: "DataVolume",
-            metadata: { name: "rocky9-datavolume" },
+            metadata: { name: "rocky9-datavolume", namespace: "default" },
             spec: {
                 pvc: {
                     accessModes: ["ReadWriteOnce"],
@@ -216,7 +261,7 @@ if (!localStorage.getItem(MOCK_DATA_VOLUMES_KEY)) {
             id: 2,
             apiVersion: "cdi.kubevirt.io/v1beta1",
             kind: "DataVolume",
-            metadata: { name: "test-dv-pvc" },
+            metadata: { name: "test-dv-pvc", namespace: "default" },
             spec: {
                 pvc: {
                     accessModes: ["ReadWriteOnce"],

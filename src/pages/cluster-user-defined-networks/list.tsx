@@ -13,6 +13,9 @@ interface CUDNRow {
     spec: {
         network: {
             topology: string;
+            layer2?: {
+                subnets?: string[];
+            };
         }
     };
 }
@@ -31,6 +34,7 @@ export const ClusterUserDefinedNetworkList = () => {
             field: "metadata.name",
             headerName: "Name",
             minWidth: 200,
+            flex: 1,
             valueGetter: (_value, row) => {
                 return (row as CUDNRow)?.metadata?.name;
             }
@@ -41,6 +45,18 @@ export const ClusterUserDefinedNetworkList = () => {
             minWidth: 150,
             valueGetter: (_value, row) => {
                 return (row as CUDNRow)?.spec?.network?.topology;
+            }
+        },
+        {
+            field: "spec.network.layer2.subnets",
+            headerName: "Subnet",
+            minWidth: 200,
+            valueGetter: (_value, row) => {
+                const network = (row as CUDNRow)?.spec?.network;
+                if (network?.topology === "Layer2" && network?.layer2?.subnets) {
+                    return network.layer2.subnets.join(", ");
+                }
+                return "";
             }
         },
         {

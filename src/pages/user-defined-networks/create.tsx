@@ -91,6 +91,25 @@ export const UserDefinedNetworkCreate = () => {
                 sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                 autoComplete="off"
             >
+                <FormControl fullWidth margin="normal">
+                    <InputLabel id="namespace-label">Namespace</InputLabel>
+                    <Select
+                        labelId="namespace-label"
+                        {...register("metadata.namespace", { required: "This field is required" })}
+                        label="Namespace"
+                        defaultValue=""
+                    >
+                        {query?.data?.data.map((item: any) => (
+                            <MenuItem key={item.id} value={item.metadata.name}>
+                                {item.metadata.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {errors.metadata?.namespace && (
+                        <FormHelperText error>{errors.metadata?.namespace.message as string}</FormHelperText>
+                    )}
+                </FormControl>
+
                 <TextField
                     {...register("metadata.name", {
                         required: "This field is required",

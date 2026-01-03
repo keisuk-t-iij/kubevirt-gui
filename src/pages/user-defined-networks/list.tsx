@@ -11,9 +11,12 @@ interface UDNRow {
     id: number;
     metadata: {
         name: string;
+        namespace: string;
     };
     spec: {
-        layer2?: any;
+        layer2?: {
+            subnets?: string[];
+        };
         layer3?: any;
     };
 }
@@ -32,8 +35,17 @@ export const UserDefinedNetworkList = () => {
             field: "metadata.name",
             headerName: "Name",
             minWidth: 200,
+            flex: 1,
             valueGetter: (_value, row) => {
                 return (row as UDNRow)?.metadata?.name;
+            }
+        },
+        {
+            field: "metadata.namespace",
+            headerName: "Namespace",
+            minWidth: 150,
+            valueGetter: (_value, row) => {
+                return (row as UDNRow)?.metadata?.namespace || "default";
             }
         },
         {
@@ -44,6 +56,18 @@ export const UserDefinedNetworkList = () => {
                 if ((row as UDNRow)?.spec?.layer2) return "Layer 2 (Secondary)";
                 if ((row as UDNRow)?.spec?.layer3) return "Layer 3 (Primary)";
                 return "Unknown";
+            }
+        },
+        {
+            field: "spec.layer2.subnets",
+            headerName: "Subnet",
+            minWidth: 200,
+            valueGetter: (_value, row) => {
+                const layer2 = (row as UDNRow)?.spec?.layer2;
+                if (layer2 && layer2.subnets) {
+                    return layer2.subnets.join(", ");
+                }
+                return "";
             }
         },
         {

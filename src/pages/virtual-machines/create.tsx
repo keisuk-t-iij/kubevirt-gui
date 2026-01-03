@@ -124,7 +124,10 @@ export const VirtualMachineCreate = () => {
             kind: "VirtualMachine",
             metadata: {
                 name: data.metadata.name,
-                namespace: data.metadata.namespace
+                namespace: data.metadata.namespace,
+                annotations: {
+                    "kubevirt-gui/network-pattern": data.networkPattern
+                }
             },
             spec: {
                 instancetype: {
