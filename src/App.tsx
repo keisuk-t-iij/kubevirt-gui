@@ -1,4 +1,4 @@
-import { GitHubBanner, Refine } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -22,6 +22,7 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { customDataProvider } from "./providers/custom-data-provider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
+import { Title } from "./components/title";
 import {
   UserDefinedNetworkList,
   UserDefinedNetworkCreate,
@@ -54,7 +55,6 @@ import {
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <ColorModeContextProvider>
           <CssBaseline />
@@ -129,7 +129,7 @@ function App() {
                 <Routes>
                   <Route
                     element={
-                      <ThemedLayout Header={() => <Header sticky />}>
+                      <ThemedLayout Header={() => <Header sticky />} Title={Title}>
                         <Outlet />
                       </ThemedLayout>
                     }
