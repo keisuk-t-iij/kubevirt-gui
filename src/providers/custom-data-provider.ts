@@ -235,6 +235,15 @@ const handleDeleteOne = (_resource: string, key: string, id: any) => {
     } as any;
 };
 
+const handleDeleteMany = (_resource: string, key: string, ids: any[]) => {
+    const data = getMockData(key);
+    const newData = data.filter((item: any) => !ids.map(String).includes(String(item.id)));
+    setMockData(key, newData);
+    return {
+        data: ids.map(id => ({ id })),
+    } as any;
+};
+
 // ... existing imports
 
 
@@ -344,6 +353,15 @@ export const customDataProvider: DataProvider = {
         if (resource === "namespaces") return handleDeleteOne(resource, MOCK_NAMESPACES_KEY, id);
 
         return baseDataProvider.deleteOne({ resource, id, variables, meta });
+    },
+
+    deleteMany: async ({ resource, ids, variables, meta }) => {
+        if (resource === "virtual_machines") return handleDeleteMany(resource, MOCK_VMS_KEY, ids);
+        if (resource === "user_defined_networks") return handleDeleteMany(resource, MOCK_UDNS_KEY, ids);
+        if (resource === "data_volumes") return handleDeleteMany(resource, MOCK_DATA_VOLUMES_KEY, ids);
+        if (resource === "namespaces") return handleDeleteMany(resource, MOCK_NAMESPACES_KEY, ids);
+
+        return baseDataProvider.deleteMany!({ resource, ids, variables, meta });
     },
 
     getApiUrl: () => API_URL,

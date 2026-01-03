@@ -1,3 +1,4 @@
+import React from "react";
 import {
     List,
     ShowButton,
@@ -6,6 +7,8 @@ import {
     useDataGrid,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useDeleteMany } from "@refinedev/core";
+import Button from "@mui/material/Button";
 
 interface VMRow {
     id: number;
@@ -36,6 +39,10 @@ interface VMRow {
 
 export const VirtualMachineList = () => {
     const { dataGridProps } = useDataGrid();
+    const { mutate: deleteMany } = useDeleteMany();
+
+    // We can use the DataGrid's selection model, but we need to track it to show a delete button
+    const [rowSelectionModel, setRowSelectionModel] = React.useState<any[]>([]);
 
     const columns: GridColDef[] = [
         {
@@ -122,8 +129,36 @@ export const VirtualMachineList = () => {
     ];
 
     return (
-        <List>
-            <DataGrid {...dataGridProps} columns={columns} autoHeight />
+        <List headerButtons={({ defaultButtons }) => (
+            <>
+                {defaultButtons}
+                {rowSelectionModel.length > 0 && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            deleteMany({
+                                resource: "virtual_machines",
+                                ids: rowSelectionModel,
+                            });
+                            setRowSelectionModel([]);
+                        }}
+                    >
+                        Delete Selected
+                    </Button>
+                )}
+            </>
+        )}>
+            <DataGrid
+                {...dataGridProps}
+                columns={columns}
+                autoHeight
+                checkboxSelection
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel as any[]);
+                }}
+                rowSelectionModel={rowSelectionModel}
+            />
         </List>
     );
 };

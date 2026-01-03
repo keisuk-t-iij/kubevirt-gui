@@ -6,10 +6,14 @@ import {
     ShowButton,
     DeleteButton,
 } from "@refinedev/mui";
+import { useDeleteMany } from "@refinedev/core";
+import Button from "@mui/material/Button";
 import React from "react";
 
 export const DataVolumeList = () => {
     const { dataGridProps } = useDataGrid();
+    const { mutate: deleteMany } = useDeleteMany();
+    const [rowSelectionModel, setRowSelectionModel] = React.useState<any[]>([]);
 
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", type: "number", width: 50 },
@@ -73,8 +77,36 @@ export const DataVolumeList = () => {
     ];
 
     return (
-        <List>
-            <DataGrid {...dataGridProps} columns={columns} autoHeight />
+        <List headerButtons={({ defaultButtons }) => (
+            <>
+                {defaultButtons}
+                {rowSelectionModel.length > 0 && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            deleteMany({
+                                resource: "data_volumes",
+                                ids: rowSelectionModel,
+                            });
+                            setRowSelectionModel([]);
+                        }}
+                    >
+                        Delete Selected
+                    </Button>
+                )}
+            </>
+        )}>
+            <DataGrid
+                {...dataGridProps}
+                columns={columns}
+                autoHeight
+                checkboxSelection
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel as any[]);
+                }}
+                rowSelectionModel={rowSelectionModel}
+            />
         </List>
     );
 };

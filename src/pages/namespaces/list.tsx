@@ -1,10 +1,13 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useDataGrid, List, EditButton, ShowButton, DeleteButton } from "@refinedev/mui";
+import { useDeleteMany } from "@refinedev/core";
 import React from "react";
-import { Chip } from "@mui/material";
+import { Chip, Button } from "@mui/material";
 
 export const NamespaceList = () => {
     const { dataGridProps } = useDataGrid();
+    const { mutate: deleteMany } = useDeleteMany();
+    const [rowSelectionModel, setRowSelectionModel] = React.useState<any[]>([]);
 
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 50 },
@@ -53,8 +56,36 @@ export const NamespaceList = () => {
     ];
 
     return (
-        <List>
-            <DataGrid {...dataGridProps} columns={columns} autoHeight />
+        <List headerButtons={({ defaultButtons }) => (
+            <>
+                {defaultButtons}
+                {rowSelectionModel.length > 0 && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            deleteMany({
+                                resource: "namespaces",
+                                ids: rowSelectionModel,
+                            });
+                            setRowSelectionModel([]);
+                        }}
+                    >
+                        Delete Selected
+                    </Button>
+                )}
+            </>
+        )}>
+            <DataGrid
+                {...dataGridProps}
+                columns={columns}
+                autoHeight
+                checkboxSelection
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel as any[]);
+                }}
+                rowSelectionModel={rowSelectionModel}
+            />
         </List>
     );
 };

@@ -6,6 +6,9 @@ import {
     useDataGrid,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useDeleteMany } from "@refinedev/core";
+import Button from "@mui/material/Button";
+import React from "react";
 
 interface UDNRow {
     id: number;
@@ -23,6 +26,8 @@ interface UDNRow {
 
 export const UserDefinedNetworkList = () => {
     const { dataGridProps } = useDataGrid();
+    const { mutate: deleteMany } = useDeleteMany();
+    const [rowSelectionModel, setRowSelectionModel] = React.useState<any[]>([]);
 
     const columns: GridColDef[] = [
         {
@@ -88,8 +93,36 @@ export const UserDefinedNetworkList = () => {
     ];
 
     return (
-        <List>
-            <DataGrid {...dataGridProps} columns={columns} autoHeight />
+        <List headerButtons={({ defaultButtons }) => (
+            <>
+                {defaultButtons}
+                {rowSelectionModel.length > 0 && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            deleteMany({
+                                resource: "user_defined_networks",
+                                ids: rowSelectionModel,
+                            });
+                            setRowSelectionModel([]);
+                        }}
+                    >
+                        Delete Selected
+                    </Button>
+                )}
+            </>
+        )}>
+            <DataGrid
+                {...dataGridProps}
+                columns={columns}
+                autoHeight
+                checkboxSelection
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel as any[]);
+                }}
+                rowSelectionModel={rowSelectionModel}
+            />
         </List>
     );
 };
