@@ -16,7 +16,8 @@ export const ClusterUserDefinedNetworkShow = () => {
     let yamlContent = "";
     try {
         if (record) {
-            yamlContent = dump(record);
+            const { id, ...rest } = record;
+            yamlContent = dump(rest);
         } else {
             yamlContent = "No record found.";
         }
