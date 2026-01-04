@@ -27,7 +27,7 @@ export const NamespaceEdit = () => {
 
     useEffect(() => {
         if (record) {
-            const isPrimary = record.metadata?.labels?.["openstack.org/primary-network"] === "true";
+            const isPrimary = record.metadata?.labels?.["k8s.ovn.org/primary-user-defined-network"] === "true";
             const isDefault = record.metadata?.annotations?.["kubevirt-gui/default-namespace"] === "true";
             setValue("isPrimaryNetwork", isPrimary);
             setValue("isDefaultNamespace", isDefault);
@@ -46,9 +46,9 @@ export const NamespaceEdit = () => {
         };
 
         if (data.isPrimaryNetwork) {
-            resource.metadata.labels["openstack.org/primary-network"] = "true";
+            resource.metadata.labels["k8s.ovn.org/primary-user-defined-network"] = "true";
         } else {
-            delete resource.metadata.labels["openstack.org/primary-network"];
+            delete resource.metadata.labels["k8s.ovn.org/primary-user-defined-network"];
         }
 
         if (data.isDefaultNamespace) {
@@ -79,7 +79,7 @@ export const NamespaceEdit = () => {
                 />
 
                 <FormControlLabel
-                    control={<Checkbox {...register("isPrimaryNetwork")} defaultChecked={record?.metadata?.labels?.["openstack.org/primary-network"] === "true"} />}
+                    control={<Checkbox {...register("isPrimaryNetwork")} defaultChecked={record?.metadata?.labels?.["k8s.ovn.org/primary-user-defined-network"] === "true"} />}
                     label="Use Primary Network"
                 />
 
