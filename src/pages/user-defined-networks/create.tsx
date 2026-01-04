@@ -11,7 +11,9 @@ interface UserDefinedNetworkFormValues {
         namespace: string;
     };
     networkType: "Layer2" | "Layer3";
-    subnet: string;
+    subnet?: string;
+    layer3Cidr?: string;
+    layer3HostSubnet?: number;
 }
 
 export const UserDefinedNetworkCreate = () => {
@@ -56,6 +58,7 @@ export const UserDefinedNetworkCreate = () => {
             kind: "UserDefinedNetwork",
             metadata: {
                 name: data.metadata.name,
+                namespace: data.metadata.namespace,
             },
             spec: {}
         };
@@ -74,10 +77,12 @@ export const UserDefinedNetworkCreate = () => {
             resource.spec.topology = "Layer3";
             resource.spec.layer3 = {
                 role: "Primary",
-                ipam: {
-                    mode: "Enabled",
-                    lifecycle: "Persistent"
-                }
+                subnets: [
+                    {
+                        cidr: data.layer3Cidr,
+                        hostSubnet: Number(data.layer3HostSubnet)
+                    }
+                ]
             };
         }
 
@@ -142,24 +147,60 @@ export const UserDefinedNetworkCreate = () => {
                     </FormHelperText>
                 </FormControl>
 
-                <TextField
-                    {...register("subnet", {
-                        required: networkType === "Layer2" ? "This field is required" : false,
-                        pattern: {
-                            value: /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
-                            message: "Invalid CIDR format (e.g., 192.168.1.0/24)"
-                        }
-                    })}
-                    disabled={networkType === "Layer3"}
-                    error={!!errors.subnet}
-                    helperText={(errors.subnet?.message as string) || (networkType === "Layer3" ? "Subnet is not configurable for Layer 3 (Primary) networks" : "CIDR notation (e.g. 192.168.1.0/24)")}
-                    margin="normal"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    type="text"
-                    label="Subnet"
-                    name="subnet"
-                />
+                {networkType === "Layer2" && (
+                    <TextField
+                        {...register("subnet", {
+                            required: "This field is required",
+                            pattern: {
+                                value: /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
+                                message: "Invalid CIDR format (e.g., 192.168.1.0/24)"
+                            }
+                        })}
+                        error={!!errors.subnet}
+                        helperText={(errors.subnet?.message as string) || "CIDR notation (e.g. 192.168.1.0/24)"}
+                        margin="normal"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        type="text"
+                        label="Subnet"
+                        name="subnet"
+                    />
+                )}
+
+                {networkType === "Layer3" && (
+                    <>
+                        <TextField
+                            {...register("layer3Cidr", {
+                                required: "This field is required for Layer 3",
+                                pattern: {
+                                    value: /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
+                                    message: "Invalid CIDR format (e.g., 10.10.0.0/16)"
+                                }
+                            })}
+                            error={!!errors.layer3Cidr}
+                            helperText={(errors.layer3Cidr?.message as string) || "CIDR notation (e.g. 10.10.0.0/16)"}
+                            margin="normal"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                            type="text"
+                            label="CIDR"
+                        />
+                        <TextField
+                            {...register("layer3HostSubnet", {
+                                required: "This field is required for Layer 3",
+                                min: { value: 1, message: "Must be greater than 0" },
+                                max: { value: 128, message: "Must be less than 128" }
+                            })}
+                            error={!!errors.layer3HostSubnet}
+                            helperText={(errors.layer3HostSubnet?.message as string) || "Host Subnet Prefix Length (e.g. 24)"}
+                            margin="normal"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                            type="number"
+                            label="Host Subnet"
+                        />
+                    </>
+                )}
             </Box>
         </Create>
     );
