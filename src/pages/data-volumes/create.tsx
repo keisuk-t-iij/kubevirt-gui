@@ -135,15 +135,24 @@ export const DataVolumeCreate = () => {
                 </FormControl>
 
                 {sourceType === "http" && (
-                    <TextField
-                        {...register("httpUrl", { required: "HTTP URL is required for HTTP source" })}
-                        error={!!errors.httpUrl}
-                        helperText={errors.httpUrl?.message as string}
-                        label="HTTP URL"
-                        placeholder="http://example.com/image.qcow2"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="http-url-label">HTTP URL</InputLabel>
+                        <Select
+                            labelId="http-url-label"
+                            {...register("httpUrl", { required: "HTTP URL is required for HTTP source" })}
+                            label="HTTP URL"
+                            defaultValue="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-int-20251217-template.qcow2"
+                            error={!!errors.httpUrl}
+                        >
+                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-int-20251217-template.qcow2">sre-ubuntu2204-int-20251217-template.qcow2</MenuItem>
+                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-rocky9-int-20251217-template.qcow2">sre-rocky9-int-20251217-template.qcow2</MenuItem>
+                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-stubl9-int-20250618-template.qcow2">sre-stubl9-int-20250618-template.qcow2</MenuItem>
+                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-debug-int-20251217-template.qcow2">sre-ubuntu2204-debug-int-20251217-template.qcow2</MenuItem>
+                        </Select>
+                        {errors.httpUrl && (
+                            <FormHelperText error>{errors.httpUrl.message as string}</FormHelperText>
+                        )}
+                    </FormControl>
                 )}
 
                 {sourceType === "pvc" && (

@@ -193,7 +193,7 @@ export const VirtualMachineCreate = () => {
 
         // 1. OS Volume
         if (data.volumeType === "containerDisk") {
-            const volName = data.containerDiskName || "containerdisk-0";
+            const volName = data.containerDiskName || "os-volume";
             volumes.push({
                 name: volName,
                 containerDisk: {
@@ -205,7 +205,7 @@ export const VirtualMachineCreate = () => {
                 disk: { bus: "virtio" }
             });
         } else if (data.volumeType === "dataVolume") {
-            const volName = data.dataVolumeVolumeName || "datavolume-0";
+            const volName = data.dataVolumeVolumeName || "os-volume";
             volumes.push({
                 name: volName,
                 dataVolume: {
@@ -376,19 +376,27 @@ export const VirtualMachineCreate = () => {
                             error={!!errors.containerDiskName}
                             helperText={errors.containerDiskName?.message as string}
                             label="Volume Name"
-                            defaultValue="containerdisk-0"
+                            defaultValue="os-volume"
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                         />
-                        <TextField
-                            {...register("containerDiskImage", { required: "Container Image is required" })}
-                            error={!!errors.containerDiskImage}
-                            helperText={errors.containerDiskImage?.message as string}
-                            label="Container Image"
-                            placeholder="e.g. quay.io/containerdisks/rocky:9"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                        />
+                        <FormControl fullWidth>
+                            <InputLabel id="container-image-label">Container Image</InputLabel>
+                            <Select
+                                labelId="container-image-label"
+                                {...register("containerDiskImage", { required: "Container Image is required" })}
+                                label="Container Image"
+                                defaultValue="ikr.iij.jp/virt/rocky-int:9"
+                                error={!!errors.containerDiskImage}
+                            >
+                                <MenuItem value="ikr.iij.jp/virt/rocky-int:9">ikr.iij.jp/virt/rocky-int:9</MenuItem>
+                                <MenuItem value="ikr.iij.jp/virt/ubuntu-int:22.04">ikr.iij.jp/virt/ubuntu-int:22.04</MenuItem>
+                                <MenuItem value="ikr.iij.jp/virt/ubuntu-debug-int:22.04">ikr.iij.jp/virt/ubuntu-debug-int:22.04</MenuItem>
+                            </Select>
+                            {errors.containerDiskImage && (
+                                <FormHelperText error>{errors.containerDiskImage.message as string}</FormHelperText>
+                            )}
+                        </FormControl>
                     </Box>
                 )}
 
@@ -399,7 +407,7 @@ export const VirtualMachineCreate = () => {
                             error={!!errors.dataVolumeVolumeName}
                             helperText={errors.dataVolumeVolumeName?.message as string}
                             label="Volume Name"
-                            defaultValue="datavolume-0"
+                            defaultValue="os-volume"
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                         />
