@@ -28,8 +28,8 @@ interface VirtualMachineFormValues {
         name: string;
         type: "cloudInitNoCloud" | "persistentVolumeClaim" | "configMap" | "secret";
         // cloudInitNoCloud fields
-        cloudInitUserDataBase64?: string;
-        cloudInitNetworkDataBase64?: string;
+        cloudInitUserData?: string;
+        cloudInitNetworkData?: string;
         // persistentVolumeClaim fields
         pvcClaimName?: string;
         // configMap fields
@@ -224,10 +224,13 @@ export const VirtualMachineCreate = () => {
                 const volConfig: any = { name: vol.name };
 
                 if (vol.type === "cloudInitNoCloud") {
-                    volConfig.cloudInitNoCloud = {
-                        userDataBase64: vol.cloudInitUserDataBase64,
-                        networkDataBase64: vol.cloudInitNetworkDataBase64
-                    };
+                    volConfig.cloudInitNoCloud = {};
+                    if (vol.cloudInitUserData && vol.cloudInitUserData.trim() !== "") {
+                        volConfig.cloudInitNoCloud.userDataBase64 = btoa(vol.cloudInitUserData);
+                    }
+                    if (vol.cloudInitNetworkData && vol.cloudInitNetworkData.trim() !== "") {
+                        volConfig.cloudInitNoCloud.networkDataBase64 = btoa(vol.cloudInitNetworkData);
+                    }
                 } else if (vol.type === "persistentVolumeClaim") {
                     volConfig.persistentVolumeClaim = {
                         claimName: vol.pvcClaimName
@@ -482,16 +485,21 @@ export const VirtualMachineCreate = () => {
                                 {additionalVolumes && additionalVolumes[index]?.type === "cloudInitNoCloud" && (
                                     <>
                                         <TextField
-                                            {...register(`additionalVolumes.${index}.cloudInitUserDataBase64`)}
-                                            label="User Data (Base64)"
+                                            {...register(`additionalVolumes.${index}.cloudInitUserData`)}
+                                            label="User Data (Plain Text)"
                                             fullWidth
                                             multiline
-                                            rows={2}
+                                            rows={5}
                                             InputLabelProps={{ shrink: true }}
+                                            defaultValue={`#cloud-config
+write_files:
+  - content: AllowGroups \${SERVICE_GROUP}
+    path: /etc/ssh/sshd_config
+    append: true`}
                                         />
                                         <TextField
-                                            {...register(`additionalVolumes.${index}.cloudInitNetworkDataBase64`)}
-                                            label="Network Data (Base64)"
+                                            {...register(`additionalVolumes.${index}.cloudInitNetworkData`)}
+                                            label="Network Data (Plain Text)"
                                             fullWidth
                                             multiline
                                             rows={2}
