@@ -99,14 +99,22 @@ export const DataVolumeCreate = () => {
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                 />
-                <TextField
-                    {...register("metadata.namespace")}
-                    label="Namespace"
-                    defaultValue="default"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    helperText="Defaults to 'default' if empty"
-                />
+                <FormControl fullWidth>
+                    <InputLabel id="namespace-label">Namespace</InputLabel>
+                    <Select
+                        labelId="namespace-label"
+                        {...register("metadata.namespace")}
+                        label="Namespace"
+                        defaultValue="default"
+                    >
+                        {query?.data?.data.map((item: any) => (
+                            <MenuItem key={item.id} value={item.metadata.name}>
+                                {item.metadata.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText>Defaults to 'default' if empty</FormHelperText>
+                </FormControl>
 
                 <TextField
                     {...register("storage", { required: "Storage size is required" })}

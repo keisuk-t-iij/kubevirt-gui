@@ -272,14 +272,25 @@ export const VirtualMachineCreate = () => {
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                 />
-                <TextField
-                    {...register("metadata.namespace", { required: "Namespace is required" })}
-                    error={!!errors.metadata?.namespace}
-                    helperText={errors.metadata?.namespace?.message as string}
-                    label="Namespace"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
+                <FormControl fullWidth>
+                    <InputLabel id="namespace-label">Namespace</InputLabel>
+                    <Select
+                        labelId="namespace-label"
+                        {...register("metadata.namespace", { required: "Namespace is required" })}
+                        label="Namespace"
+                        defaultValue=""
+                        error={!!errors.metadata?.namespace}
+                    >
+                        {query?.data?.data.map((item: any) => (
+                            <MenuItem key={item.id} value={item.metadata.name}>
+                                {item.metadata.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {errors.metadata?.namespace && (
+                        <FormHelperText error>{errors.metadata?.namespace.message as string}</FormHelperText>
+                    )}
+                </FormControl>
 
                 <FormControl fullWidth>
                     <InputLabel id="instancetype-label">Instance Type</InputLabel>
