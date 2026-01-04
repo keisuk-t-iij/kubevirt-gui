@@ -38,7 +38,7 @@ export const NamespaceCreate = () => {
         };
 
         if (data.isPrimaryNetwork) {
-            resource.metadata.labels["openstack.org/primary-network"] = "true";
+            resource.metadata.labels["k8s.ovn.org/primary-user-defined-network"] = "true";
         }
 
         if (data.isDefaultNamespace) {
@@ -67,7 +67,7 @@ export const NamespaceCreate = () => {
 
                 <FormControlLabel
                     control={<Checkbox {...register("isPrimaryNetwork")} />}
-                    label="Use Primary Network (openstack.org/primary-network=true)"
+                    label="Use Primary Network (k8s.ovn.org/primary-user-defined-network=true)"
                 />
 
                 <Box sx={{ border: '1px solid #ddd', p: 2, borderRadius: 1 }}>

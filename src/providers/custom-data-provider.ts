@@ -109,7 +109,7 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
             id: 1,
             apiVersion: "kubevirt.io/v1",
             kind: "UserDefinedNetwork",
-            metadata: { name: "l2-network", namespace: "default" },
+            metadata: { name: "secondary-network", namespace: "default" },
             spec: {
                 layer2: {
                     role: "Secondary",
@@ -123,11 +123,11 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
             id: 2,
             apiVersion: "kubevirt.io/v1",
             kind: "UserDefinedNetwork",
-            metadata: { name: "l3-network", namespace: "default" },
+            metadata: { name: "primary-network", namespace: "default" },
             spec: {
                 layer3: {
                     role: "Primary",
-                    ipam: { mode: "Enabled", lifecycle: "Persistent" }
+                    subnets: [{ cidr: "172.16.0.0/16", hostSubnet: 24 }]
                 },
                 topology: "Layer3"
             }
@@ -143,19 +143,19 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
             id: 1,
             apiVersion: "kubevirt.io/v1",
             kind: "ClusterUserDefinedNetwork",
-            metadata: { name: "cluster-l2-net" },
+            metadata: { name: "cluster-secondary-net" },
             spec: {
                 network: {
                     topology: "Layer2",
                     layer2: {
                         role: "Secondary",
                         subnets: ["172.16.0.0/16"],
-                        ipam: { mode: "Enabled" }
+                        ipam: { mode: "Enabled", lifecycle: "Persistent" }
                     }
                 },
                 namespaceSelector: {
                     matchExpressions: [
-                        { key: "kubernetes.io/metadata.name", operator: "In", values: ["test-ns"] }
+                        { key: "kubernetes.io/metadata.name", operator: "In", values: ["default", "my-namespace"] }
                     ]
                 }
             }
@@ -167,10 +167,18 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
             metadata: { name: "cluster-localnet" },
             spec: {
                 network: {
-                    topology: "Layer2", // Assumed simplify, usually uses 'localnet' in other contexts but keeping to provided schemas
+                    topology: "Localnet",
+                    localnet: {
+                        role: "Secondary",
+                        physicalNetworkName: "localnet-v2357",
+                        subnets: ["10.10.25.0/24"],
+                        ipam: { mode: "Enabled", lifecycle: "Persistent" }
+                    }
                 },
                 namespaceSelector: {
-                    matchExpressions: []
+                    matchExpressions: [
+                        { key: "kubernetes.io/metadata.name", operator: "In", values: ["default", "my-namespace"] }
+                    ]
                 }
             }
         }
