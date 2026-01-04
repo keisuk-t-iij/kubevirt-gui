@@ -72,6 +72,10 @@ export const UserDefinedNetworkList = () => {
                 if (layer2 && layer2.subnets) {
                     return layer2.subnets.join(", ");
                 }
+                const layer3 = (row as UDNRow)?.spec?.layer3;
+                if (layer3 && layer3.subnets) {
+                    return layer3.subnets.map((s: any) => s.cidr).join(", ");
+                }
                 return "";
             }
         },

@@ -16,7 +16,18 @@ interface CUDNRow {
             layer2?: {
                 subnets?: string[];
             };
-        }
+            localnet?: {
+                subnets?: string[];
+                physicalNetworkName?: string;
+            };
+        };
+        namespaceSelector?: {
+            matchExpressions?: {
+                key: string;
+                operator: string;
+                values: string[];
+            }[];
+        };
     };
 }
 
@@ -40,6 +51,25 @@ export const ClusterUserDefinedNetworkList = () => {
             }
         },
         {
+            field: "namespaces",
+            headerName: "Namespaces",
+            minWidth: 250,
+            valueGetter: (_value, row) => {
+                const expressions = (row as CUDNRow)?.spec?.namespaceSelector?.matchExpressions;
+                if (expressions) {
+                    const namespaceExpr = expressions.find(
+                        (expr: any) =>
+                            expr.key === "kubernetes.io/metadata.name" &&
+                            expr.operator === "In"
+                    );
+                    if (namespaceExpr && namespaceExpr.values) {
+                        return namespaceExpr.values.join(", ");
+                    }
+                }
+                return "All"; // Or empty string, depending on interpretation of empty selector
+            }
+        },
+        {
             field: "spec.network.topology",
             headerName: "Topology",
             minWidth: 150,
@@ -55,6 +85,21 @@ export const ClusterUserDefinedNetworkList = () => {
                 const network = (row as CUDNRow)?.spec?.network;
                 if (network?.topology === "Layer2" && network?.layer2?.subnets) {
                     return network.layer2.subnets.join(", ");
+                }
+                if (network?.topology === "Localnet" && network?.localnet?.subnets) {
+                    return network.localnet.subnets.join(", ");
+                }
+                return "";
+            }
+        },
+        {
+            field: "spec.network.localnet.physicalNetworkName",
+            headerName: "Physical Network",
+            minWidth: 150,
+            valueGetter: (_value, row) => {
+                const network = (row as CUDNRow)?.spec?.network;
+                if (network?.topology === "Localnet" && network?.localnet?.physicalNetworkName) {
+                    return network.localnet.physicalNetworkName;
                 }
                 return "";
             }

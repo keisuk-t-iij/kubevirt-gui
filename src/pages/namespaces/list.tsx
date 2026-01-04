@@ -23,7 +23,7 @@ export const NamespaceList = () => {
             headerName: "Primary Network",
             minWidth: 150,
             renderCell: ({ row }) => {
-                const isPrimary = row?.metadata?.labels?.["openstack.org/primary-network"] === "true";
+                const isPrimary = row?.metadata?.labels?.["k8s.ovn.org/primary-user-defined-network"] === "true";
                 return isPrimary ? <Chip label="Yes" color="primary" size="small" /> : <Chip label="No" size="small" variant="outlined" />;
             }
         },
