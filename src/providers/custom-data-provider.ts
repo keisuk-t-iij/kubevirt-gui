@@ -16,6 +16,8 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
     const initialData = [
         {
             id: 1,
+            apiVersion: "kubevirt.io/v1",
+            kind: "VirtualMachine",
             metadata: {
                 name: "test-vm-1",
                 namespace: "default",
@@ -40,6 +42,8 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
         },
         {
             id: 2,
+            apiVersion: "kubevirt.io/v1",
+            kind: "VirtualMachine",
             metadata: {
                 name: "test-vm-2",
                 namespace: "default",
@@ -61,46 +65,41 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
                 }
             },
             status: { printableStatus: "Stopped" }
+        },
+        {
+            id: 3,
+            apiVersion: "kubevirt.io/v1",
+            kind: "VirtualMachine",
+            metadata: {
+                name: "test-vm-3",
+                namespace: "default",
+                annotations: { "kubevirt-gui/network-pattern": "DefaultSecondary" }
+            },
+            spec: {
+                instancetype: { name: "u1.small" },
+                runStrategy: "Always",
+                template: {
+                    spec: {
+                        domain: {
+                            devices: {
+                                interfaces: [
+                                    { name: "default", masquerade: {} },
+                                    { name: "secondary-0", bridge: {} }
+                                ],
+                                resources: {}
+                            }
+                        },
+                        networks: [
+                            { name: "default", pod: {} },
+                            { name: "secondary-0", multus: { networkName: "l2-network" } }
+                        ]
+                    }
+                }
+            },
+            status: { printableStatus: "Running" }
         }
     ];
     localStorage.setItem(MOCK_VMS_KEY, JSON.stringify(initialData));
-}
-
-// Ensure test-vm-3 exists (for Secondary Network testing)
-const existingVMs = JSON.parse(localStorage.getItem(MOCK_VMS_KEY) || "[]");
-if (!existingVMs.find((vm: any) => vm.id === 3)) {
-    const vm3 = {
-        id: 3,
-        metadata: {
-            name: "test-vm-3",
-            namespace: "default",
-            annotations: { "kubevirt-gui/network-pattern": "DefaultSecondary" }
-        },
-        spec: {
-            instancetype: { name: "u1.small" },
-            runStrategy: "Always",
-            template: {
-                spec: {
-                    domain: {
-                        devices: {
-                            interfaces: [
-                                { name: "default", masquerade: {} },
-                                { name: "secondary-0", bridge: {} }
-                            ],
-                            resources: {}
-                        }
-                    },
-                    networks: [
-                        { name: "default", pod: {} },
-                        { name: "secondary-0", multus: { networkName: "l2-network" } }
-                    ]
-                }
-            }
-        },
-        status: { printableStatus: "Running" }
-    };
-    existingVMs.push(vm3);
-    localStorage.setItem(MOCK_VMS_KEY, JSON.stringify(existingVMs));
 }
 
 // Initialize mock data for UserDefinedNetworks if empty
@@ -108,6 +107,8 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
     const initialData = [
         {
             id: 1,
+            apiVersion: "kubevirt.io/v1",
+            kind: "UserDefinedNetwork",
             metadata: { name: "l2-network", namespace: "default" },
             spec: {
                 layer2: {
@@ -120,6 +121,8 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
         },
         {
             id: 2,
+            apiVersion: "kubevirt.io/v1",
+            kind: "UserDefinedNetwork",
             metadata: { name: "l3-network", namespace: "default" },
             spec: {
                 layer3: {
@@ -138,6 +141,8 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
     const initialData = [
         {
             id: 1,
+            apiVersion: "kubevirt.io/v1",
+            kind: "ClusterUserDefinedNetwork",
             metadata: { name: "cluster-l2-net" },
             spec: {
                 network: {
@@ -157,6 +162,8 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
         },
         {
             id: 2,
+            apiVersion: "kubevirt.io/v1",
+            kind: "ClusterUserDefinedNetwork",
             metadata: { name: "cluster-localnet" },
             spec: {
                 network: {
@@ -290,6 +297,8 @@ if (!localStorage.getItem(MOCK_NAMESPACES_KEY)) {
     const initialData = [
         {
             id: 1,
+            apiVersion: "v1",
+            kind: "Namespace",
             metadata: {
                 name: "default",
                 annotations: {
@@ -361,7 +370,14 @@ export const customDataProvider: DataProvider = {
         if (resource === "data_volumes") return handleDeleteMany(resource, MOCK_DATA_VOLUMES_KEY, ids);
         if (resource === "namespaces") return handleDeleteMany(resource, MOCK_NAMESPACES_KEY, ids);
 
-        return baseDataProvider.deleteMany!({ resource, ids, variables, meta });
+        const data = await Promise.all(
+            ids.map(async (id) => {
+                const { data } = await baseDataProvider.deleteOne({ resource, id, variables, meta });
+                return data;
+            }),
+        );
+
+        return { data };
     },
 
     getApiUrl: () => API_URL,
