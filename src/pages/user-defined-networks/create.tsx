@@ -50,6 +50,7 @@ export const UserDefinedNetworkCreate = () => {
     }, [defaultNamespaceInfo, setValue]);
 
     const networkType = watch("networkType", "Layer2");
+    const currentNamespace = watch("metadata.namespace");
 
     const onFinishHandler = (data: UserDefinedNetworkFormValues) => {
         // Transform form data to Kubernetes resource structure
@@ -96,25 +97,6 @@ export const UserDefinedNetworkCreate = () => {
                 sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                 autoComplete="off"
             >
-                <FormControl fullWidth margin="normal">
-                    <InputLabel id="namespace-label">Namespace</InputLabel>
-                    <Select
-                        labelId="namespace-label"
-                        {...register("metadata.namespace", { required: "This field is required" })}
-                        label="Namespace"
-                        defaultValue=""
-                    >
-                        {query?.data?.data.map((item: any) => (
-                            <MenuItem key={item.id} value={item.metadata.name}>
-                                {item.metadata.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    {errors.metadata?.namespace && (
-                        <FormHelperText error>{errors.metadata?.namespace.message as string}</FormHelperText>
-                    )}
-                </FormControl>
-
                 <TextField
                     {...register("metadata.name", {
                         required: "This field is required",
@@ -128,6 +110,25 @@ export const UserDefinedNetworkCreate = () => {
                     label="Name"
                     name="metadata.name"
                 />
+
+                <FormControl fullWidth margin="normal">
+                    <InputLabel id="namespace-label">Namespace</InputLabel>
+                    <Select
+                        labelId="namespace-label"
+                        {...register("metadata.namespace", { required: "This field is required" })}
+                        label="Namespace"
+                        value={currentNamespace || ""}
+                    >
+                        {query?.data?.data.map((item: any) => (
+                            <MenuItem key={item.id} value={item.metadata.name}>
+                                {item.metadata.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {errors.metadata?.namespace && (
+                        <FormHelperText error>{errors.metadata?.namespace.message as string}</FormHelperText>
+                    )}
+                </FormControl>
 
                 <FormControl fullWidth margin="normal">
                     <InputLabel id="network-type-label">Network Type</InputLabel>

@@ -26,12 +26,16 @@ export const DataVolumeCreate = () => {
         setValue
     } = useForm<DataVolumeFormValues, any, DataVolumeFormValues>({
         defaultValues: {
+            metadata: {
+                namespace: "default"
+            },
             sourceType: "http",
             storage: "40Gi"
         }
     });
 
     const sourceType = watch("sourceType", "http");
+    const currentNamespace = watch("metadata.namespace");
 
     const { options: dataVolumeOptions } = useSelect({
         resource: "data_volumes",
@@ -105,7 +109,7 @@ export const DataVolumeCreate = () => {
                         labelId="namespace-label"
                         {...register("metadata.namespace")}
                         label="Namespace"
-                        defaultValue="default"
+                        value={currentNamespace || ""}
                     >
                         {query?.data?.data.map((item: any) => (
                             <MenuItem key={item.id} value={item.metadata.name}>

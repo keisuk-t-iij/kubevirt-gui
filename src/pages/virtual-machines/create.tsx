@@ -51,6 +51,9 @@ export const VirtualMachineCreate = () => {
         setValue
     } = useForm<VirtualMachineFormValues, any, VirtualMachineFormValues>({
         defaultValues: {
+            metadata: {
+                namespace: "default"
+            },
             networkPattern: "Default",
             secondaryNetworks: [{ name: "" }],
             volumeType: "containerDisk",
@@ -117,6 +120,7 @@ export const VirtualMachineCreate = () => {
     const networkPattern = watch("networkPattern", "Default");
     const volumeType = watch("volumeType", "containerDisk");
     const additionalVolumes = watch("additionalVolumes");
+    const currentNamespace = watch("metadata.namespace");
 
     const onFinishHandler = (data: VirtualMachineFormValues) => {
         const resource: any = {
@@ -281,7 +285,7 @@ export const VirtualMachineCreate = () => {
                         labelId="namespace-label"
                         {...register("metadata.namespace", { required: "Namespace is required" })}
                         label="Namespace"
-                        defaultValue=""
+                        value={currentNamespace || ""}
                         error={!!errors.metadata?.namespace}
                     >
                         {query?.data?.data.map((item: any) => (
