@@ -66,22 +66,23 @@ export const DataVolumeCreate = () => {
                 namespace: data.metadata.namespace || "default"
             },
             spec: {
-                pvc: {
-                    accessModes: ["ReadWriteOnce"],
-                    resources: {
-                        requests: {
-                            storage: data.storage
-                        }
-                    }
-                },
                 source: {}
             }
         };
 
         if (data.sourceType === "http") {
+            resource.spec.pvc = {
+                accessModes: ["ReadWriteOnce"],
+                resources: {
+                    requests: {
+                        storage: data.storage
+                    }
+                }
+            }
             resource.spec.source.http = { url: data.httpUrl };
         } else if (data.sourceType === "pvc") {
-            resource.spec.source.pvc = { name: data.pvcName };
+            resource.spec.source.pvc = { name: data.pvcName, namespace: data.metadata.namespace };
+            resource.spec.storage = { resources: { requests: { storage: data.storage } } }
         }
 
         onFinish(resource);

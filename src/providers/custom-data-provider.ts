@@ -287,12 +287,9 @@ if (!localStorage.getItem(MOCK_DATA_VOLUMES_KEY)) {
             kind: "DataVolume",
             metadata: { name: "test-dv-pvc", namespace: "default" },
             spec: {
-                pvc: {
-                    accessModes: ["ReadWriteOnce"],
-                    resources: { requests: { storage: "20Gi" } }
-                },
+                storage: { resources: { requests: { storage: "40Gi" } } },
                 source: {
-                    pvc: { name: "existing-pvc-name" }
+                    pvc: { name: "existing-pvc-name", namespace: "default" }
                 }
             }
         }

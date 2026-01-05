@@ -55,7 +55,7 @@ export const DataVolumeList = () => {
             field: "spec.pvc.resources.requests.storage",
             headerName: "Size",
             minWidth: 100,
-            valueGetter: (_value, row) => row?.spec?.pvc?.resources?.requests?.storage
+            valueGetter: (_value, row) => row?.spec?.pvc?.resources?.requests?.storage || row?.spec?.storage?.resources?.requests?.storage
         },
         {
             field: "actions",
