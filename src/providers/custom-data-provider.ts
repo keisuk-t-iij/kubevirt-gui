@@ -107,7 +107,7 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
     const initialData = [
         {
             id: 1,
-            apiVersion: "kubevirt.io/v1",
+            apiVersion: "k8s.ovn.org/v1",
             kind: "UserDefinedNetwork",
             metadata: { name: "secondary-network", namespace: "default" },
             spec: {
@@ -121,7 +121,7 @@ if (!localStorage.getItem(MOCK_UDNS_KEY)) {
         },
         {
             id: 2,
-            apiVersion: "kubevirt.io/v1",
+            apiVersion: "k8s.ovn.org/v1",
             kind: "UserDefinedNetwork",
             metadata: { name: "primary-network", namespace: "default" },
             spec: {
@@ -141,7 +141,7 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
     const initialData = [
         {
             id: 1,
-            apiVersion: "kubevirt.io/v1",
+            apiVersion: "k8s.ovn.org/v1",
             kind: "ClusterUserDefinedNetwork",
             metadata: { name: "cluster-secondary-net" },
             spec: {
@@ -162,7 +162,7 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
         },
         {
             id: 2,
-            apiVersion: "kubevirt.io/v1",
+            apiVersion: "k8s.ovn.org/v1",
             kind: "ClusterUserDefinedNetwork",
             metadata: { name: "cluster-localnet" },
             spec: {
