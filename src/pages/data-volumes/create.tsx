@@ -1,8 +1,30 @@
 import { Create } from "@refinedev/mui";
 import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Typography, Divider, FormHelperText } from "@mui/material";
 import { useForm } from "@refinedev/react-hook-form";
-import { useSelect, useList } from "@refinedev/core";
+import { useSelect } from "@refinedev/core";
 import { useEffect } from "react";
+
+const HTTP_ENVIRONMENT_HOSTS = {
+    "sri-b": "ike-minio1800.hop.2iij.net",
+    "mte-c": "ike-minio1100.hop.2iij.net",
+    "sri-dev": "ike-minio4500.thop.2iij.net",
+} as const;
+
+const HTTP_TEMPLATE_PATHS = [
+    "/common-templates/sre-ubuntu2204-20260202-template.qcow2",
+    "/common-templates/sre-rocky9-20260202-template.qcow2",
+    "/common-templates/sre-stubl9-int-20260306-template.qcow2",
+    "/common-templates/sre-ubuntu2204-debug-20260202-template.qcow2",
+] as const;
+
+const buildHttpUrl = (
+    environment: keyof typeof HTTP_ENVIRONMENT_HOSTS,
+    templatePath: string,
+) => `https://${HTTP_ENVIRONMENT_HOSTS[environment]}${templatePath}`;
+
+const getTemplateFileName = (templatePath: string) => {
+    return templatePath.split("/").pop() ?? templatePath;
+};
 
 interface DataVolumeFormValues {
     metadata: {
@@ -11,7 +33,8 @@ interface DataVolumeFormValues {
     };
     storage: string;
     sourceType: "http" | "pvc";
-    httpUrl?: string;
+    httpEnvironment?: keyof typeof HTTP_ENVIRONMENT_HOSTS;
+    httpTemplatePath?: string;
     pvcName?: string;
 }
 
@@ -30,12 +53,16 @@ export const DataVolumeCreate = () => {
                 namespace: "default"
             },
             sourceType: "http",
-            storage: "40Gi"
+            storage: "40Gi",
+            httpEnvironment: "sri-dev",
+            httpTemplatePath: HTTP_TEMPLATE_PATHS[0]
         }
     });
 
     const sourceType = watch("sourceType", "http");
     const currentNamespace = watch("metadata.namespace");
+    const currentHttpEnvironment = watch("httpEnvironment", "sri-dev");
+    const currentHttpTemplatePath = watch("httpTemplatePath", HTTP_TEMPLATE_PATHS[0]);
 
     const { options: dataVolumeOptions } = useSelect({
         resource: "data_volumes",
@@ -79,7 +106,12 @@ export const DataVolumeCreate = () => {
                     }
                 }
             }
-            resource.spec.source.http = { url: data.httpUrl };
+            resource.spec.source.http = {
+                url: buildHttpUrl(
+                    data.httpEnvironment ?? "sri-dev",
+                    data.httpTemplatePath ?? HTTP_TEMPLATE_PATHS[0],
+                )
+            };
         } else if (data.sourceType === "pvc") {
             resource.spec.source.pvc = { name: data.pvcName, namespace: data.metadata.namespace };
             resource.spec.storage = { resources: { requests: { storage: data.storage } } }
@@ -148,24 +180,48 @@ export const DataVolumeCreate = () => {
                 </FormControl>
 
                 {sourceType === "http" && (
-                    <FormControl fullWidth>
-                        <InputLabel id="http-url-label">HTTP URL</InputLabel>
-                        <Select
-                            labelId="http-url-label"
-                            {...register("httpUrl", { required: "HTTP URL is required for HTTP source" })}
-                            label="HTTP URL"
-                            defaultValue="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-int-20251217-template.qcow2"
-                            error={!!errors.httpUrl}
-                        >
-                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-int-20251217-template.qcow2">sre-ubuntu2204-int-20251217-template.qcow2</MenuItem>
-                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-rocky9-int-20251217-template.qcow2">sre-rocky9-int-20251217-template.qcow2</MenuItem>
-                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-stubl9-int-20250618-template.qcow2">sre-stubl9-int-20250618-template.qcow2</MenuItem>
-                            <MenuItem value="https://ike-minio4500.thop.2iij.net/common-templates/sre-ubuntu2204-debug-int-20251217-template.qcow2">sre-ubuntu2204-debug-int-20251217-template.qcow2</MenuItem>
-                        </Select>
-                        {errors.httpUrl && (
-                            <FormHelperText error>{errors.httpUrl.message as string}</FormHelperText>
-                        )}
-                    </FormControl>
+                    <>
+                        <FormControl fullWidth>
+                            <InputLabel id="http-environment-label">Environment</InputLabel>
+                            <Select
+                                labelId="http-environment-label"
+                                {...register("httpEnvironment", { required: "Environment is required" })}
+                                label="Environment"
+                                value={currentHttpEnvironment || "sri-dev"}
+                                error={!!errors.httpEnvironment}
+                            >
+                                <MenuItem value="sri-b">sri-b</MenuItem>
+                                <MenuItem value="mte-c">mte-c</MenuItem>
+                                <MenuItem value="sri-dev">sri-dev</MenuItem>
+                            </Select>
+                            {errors.httpEnvironment && (
+                                <FormHelperText error>{errors.httpEnvironment.message as string}</FormHelperText>
+                            )}
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <InputLabel id="http-url-label">HTTP URL</InputLabel>
+                            <Select
+                                labelId="http-url-label"
+                                {...register("httpTemplatePath", { required: "HTTP URL is required for HTTP source" })}
+                                label="HTTP URL"
+                                value={currentHttpTemplatePath || HTTP_TEMPLATE_PATHS[0]}
+                                error={!!errors.httpTemplatePath}
+                            >
+                                {HTTP_TEMPLATE_PATHS.map((templatePath) => (
+                                    <MenuItem key={templatePath} value={templatePath}>
+                                        {getTemplateFileName(templatePath)}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            <FormHelperText>
+                                {buildHttpUrl(currentHttpEnvironment || "sri-dev", currentHttpTemplatePath || HTTP_TEMPLATE_PATHS[0])}
+                            </FormHelperText>
+                            {errors.httpTemplatePath && (
+                                <FormHelperText error>{errors.httpTemplatePath.message as string}</FormHelperText>
+                            )}
+                        </FormControl>
+                    </>
                 )}
 
                 {sourceType === "pvc" && (
