@@ -21,7 +21,10 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
             metadata: {
                 name: "test-vm-1",
                 namespace: "default",
-                annotations: { "kubevirt-gui/network-pattern": "Default" }
+                annotations: {
+                    "kubevirt-gui/network-pattern": "Default",
+                    "kubevirt-gui/vm-variant": "ike-virtual-private-cluster"
+                }
             },
             spec: {
                 instancetype: { name: "u1.small" },
@@ -47,7 +50,10 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
             metadata: {
                 name: "test-vm-2",
                 namespace: "default",
-                annotations: { "kubevirt-gui/network-pattern": "Primary" }
+                annotations: {
+                    "kubevirt-gui/network-pattern": "Primary",
+                    "kubevirt-gui/vm-variant": "ike-virtual-private-cluster"
+                }
             },
             spec: {
                 instancetype: { name: "u1.medium" },
@@ -73,7 +79,10 @@ if (!localStorage.getItem(MOCK_VMS_KEY)) {
             metadata: {
                 name: "test-vm-3",
                 namespace: "default",
-                annotations: { "kubevirt-gui/network-pattern": "DefaultSecondary" }
+                annotations: {
+                    "kubevirt-gui/network-pattern": "DefaultSecondary",
+                    "kubevirt-gui/vm-variant": "ike-virtual-private-cluster"
+                }
             },
             spec: {
                 instancetype: { name: "u1.small" },

@@ -35,8 +35,10 @@ import {
 } from "./pages/cluster-user-defined-networks";
 import {
   VirtualMachineList,
-  VirtualMachineCreate,
-  VirtualMachineEdit,
+  VirtualMachineVirtualizationCreate,
+  VirtualMachineVpcCreate,
+  VirtualMachineVirtualizationEdit,
+  VirtualMachineVpcEdit,
   VirtualMachineShow,
 } from "./pages/virtual-machines";
 import {
@@ -67,14 +69,37 @@ function App() {
                 routerProvider={routerProvider}
                 resources={[
                   {
+                    name: "virtual_machines_menu",
+                    meta: {
+                      label: "Virtual Machines",
+                    },
+                  },
+                  {
                     name: "virtual_machines",
-                    list: "/virtual-machines",
-                    create: "/virtual-machines/create",
-                    edit: "/virtual-machines/edit/:id",
-                    show: "/virtual-machines/show/:id",
+                    identifier: "virtual_machines_virtualization",
+                    list: "/virtual-machines/ike-virtualization",
+                    create: "/virtual-machines/ike-virtualization/create",
+                    edit: "/virtual-machines/ike-virtualization/edit/:id",
+                    show: "/virtual-machines/ike-virtualization/show/:id",
                     meta: {
                       canDelete: true,
-                      label: "Virtual Machines",
+                      label: "IKE Virtualization",
+                      parent: "virtual_machines_menu",
+                      vmVariant: "ike-virtualization",
+                    },
+                  },
+                  {
+                    name: "virtual_machines",
+                    identifier: "virtual_machines_vpc",
+                    list: "/virtual-machines/ike-virtual-private-cluster",
+                    create: "/virtual-machines/ike-virtual-private-cluster/create",
+                    edit: "/virtual-machines/ike-virtual-private-cluster/edit/:id",
+                    show: "/virtual-machines/ike-virtual-private-cluster/show/:id",
+                    meta: {
+                      canDelete: true,
+                      label: "IKE Virtual Private Cluster",
+                      parent: "virtual_machines_menu",
+                      vmVariant: "ike-virtual-private-cluster",
                     },
                   },
                   {
@@ -136,7 +161,7 @@ function App() {
                   >
                     <Route
                       index
-                      element={<NavigateToResource resource="virtual_machines" />}
+                      element={<NavigateToResource resource="virtual_machines_virtualization" />}
                     />
                     <Route path="/user-defined-networks">
                       <Route index element={<UserDefinedNetworkList />} />
@@ -149,10 +174,19 @@ function App() {
                       <Route path="show/:id" element={<ClusterUserDefinedNetworkShow />} />
                     </Route>
                     <Route path="/virtual-machines">
-                      <Route index element={<VirtualMachineList />} />
-                      <Route path="create" element={<VirtualMachineCreate />} />
-                      <Route path="edit/:id" element={<VirtualMachineEdit />} />
-                      <Route path="show/:id" element={<VirtualMachineShow />} />
+                      <Route index element={<NavigateToResource resource="virtual_machines_virtualization" />} />
+                      <Route path="ike-virtualization">
+                        <Route index element={<VirtualMachineList />} />
+                        <Route path="create" element={<VirtualMachineVirtualizationCreate />} />
+                        <Route path="edit/:id" element={<VirtualMachineVirtualizationEdit />} />
+                        <Route path="show/:id" element={<VirtualMachineShow />} />
+                      </Route>
+                      <Route path="ike-virtual-private-cluster">
+                        <Route index element={<VirtualMachineList />} />
+                        <Route path="create" element={<VirtualMachineVpcCreate />} />
+                        <Route path="edit/:id" element={<VirtualMachineVpcEdit />} />
+                        <Route path="show/:id" element={<VirtualMachineShow />} />
+                      </Route>
                     </Route>
                     <Route path="/data-volumes">
                       <Route index element={<DataVolumeList />} />

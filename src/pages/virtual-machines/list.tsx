@@ -7,8 +7,14 @@ import {
     useDataGrid,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useDeleteMany } from "@refinedev/core";
+import { useDeleteMany, useResourceParams } from "@refinedev/core";
 import Button from "@mui/material/Button";
+
+const VM_VARIANT_ANNOTATION = "kubevirt-gui/vm-variant";
+
+const getVmVariant = (row: any) => {
+    return row?.metadata?.annotations?.[VM_VARIANT_ANNOTATION] ?? "ike-virtual-private-cluster";
+};
 
 interface VMRow {
     id: number;
@@ -40,9 +46,21 @@ interface VMRow {
 export const VirtualMachineList = () => {
     const { dataGridProps } = useDataGrid();
     const { mutate: deleteMany } = useDeleteMany();
+    const { resource } = useResourceParams();
+    const currentVariant = resource?.meta?.vmVariant as string | undefined;
 
     // We can use the DataGrid's selection model, but we need to track it to show a delete button
     const [rowSelectionModel, setRowSelectionModel] = React.useState<any[]>([]);
+
+    const filteredRows = React.useMemo(() => {
+        const rows = dataGridProps.rows ?? [];
+
+        if (!currentVariant) {
+            return rows;
+        }
+
+        return rows.filter((row: any) => getVmVariant(row) === currentVariant);
+    }, [currentVariant, dataGridProps.rows]);
 
     const columns: GridColDef[] = [
         {
@@ -151,6 +169,7 @@ export const VirtualMachineList = () => {
         )}>
             <DataGrid
                 {...dataGridProps}
+                rows={filteredRows}
                 columns={columns}
                 autoHeight
                 checkboxSelection
