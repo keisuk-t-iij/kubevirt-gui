@@ -72,7 +72,7 @@ export const DataVolumeCreate = () => {
 
         if (data.sourceType === "http") {
             resource.spec.pvc = {
-                accessModes: ["ReadWriteOnce"],
+                accessModes: ["ReadWriteMany"],
                 resources: {
                     requests: {
                         storage: data.storage
