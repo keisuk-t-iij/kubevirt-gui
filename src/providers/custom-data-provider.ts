@@ -188,9 +188,20 @@ if (!localStorage.getItem(MOCK_CUDNS_KEY)) {
 
 if (!localStorage.getItem(MOCK_VM_CLUSTER_INSTANCETYPES_KEY)) {
     const initialData = [
-        { id: "u1.small", metadata: { name: "u1.small" } },
-        { id: "u1.medium", metadata: { name: "u1.medium" } },
-        { id: "u1.large", metadata: { name: "u1.large" } },
+        { id: "u1.nano (1core, 0.5GiB)", metadata: { name: "u1.nano" } },
+        { id: "u1.micro (1core, 1GiB)", metadata: { name: "u1.micro" } },
+        { id: "u1.small (1core, 2GiB)", metadata: { name: "u1.small" } },
+        { id: "u1.medium (1core, 4GiB)", metadata: { name: "u1.medium" } },
+        { id: "u1.large (2core, 8GiB)", metadata: { name: "u1.large" } },
+        { id: "u1.xlarge (4core, 16GiB)", metadata: { name: "u1.xlarge" } },
+        { id: "u1.2xlarge (8core, 32GiB)", metadata: { name: "u1.2xlarge" } },
+        { id: "u1.4xlarge (16core, 64GiB)", metadata: { name: "u1.4xlarge" } },
+        { id: "u1.8xlarge (32core, 128GiB)", metadata: { name: "u1.8xlarge" } },
+        { id: "m1.large (2core, 16GiB)", metadata: { name: "m1.large" } },
+        { id: "m1.xlarge (4core, 32GiB)", metadata: { name: "m1.xlarge" } },
+        { id: "m1.2xlarge (8core, 64GiB)", metadata: { name: "m1.2xlarge" } },
+        { id: "m1.4xlarge (16core, 128GiB)", metadata: { name: "m1.4xlarge" } },
+        { id: "m1.8xlarge (32core, 256GiB)", metadata: { name: "m1.8xlarge" } },
     ];
     localStorage.setItem(MOCK_VM_CLUSTER_INSTANCETYPES_KEY, JSON.stringify(initialData));
 }

@@ -101,7 +101,7 @@ export const VirtualMachineCreate = () => {
 
     const { options: instanceTypeOptions } = useSelect({
         resource: "virtual_machine_cluster_instancetypes",
-        optionLabel: "metadata.name",
+        optionLabel: "id",
         optionValue: "metadata.name",
     });
 
