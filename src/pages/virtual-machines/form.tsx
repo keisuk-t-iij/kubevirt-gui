@@ -183,6 +183,11 @@ const buildResource = (
     const interfaces: any[] = [];
     const networks: any[] = [];
 
+    const defaultPodInterface =
+        variant === "ike-virtual-private-cluster"
+            ? { name: "default", binding: { name: "l2bridge" } }
+            : { name: "default", masquerade: {} };
+
     const addSecondaryNetworks = () => {
         if (data.secondaryNetworks && data.secondaryNetworks.length > 0) {
             data.secondaryNetworks.forEach((network, index) => {
@@ -201,17 +206,17 @@ const buildResource = (
     };
 
     if (networkPattern === "Default") {
-        interfaces.push({ name: "default", masquerade: {} });
+        interfaces.push(defaultPodInterface);
         networks.push({ name: "default", pod: {} });
     } else if (networkPattern === "DefaultSecondary") {
-        interfaces.push({ name: "default", masquerade: {} });
+        interfaces.push(defaultPodInterface);
         networks.push({ name: "default", pod: {} });
         addSecondaryNetworks();
     } else if (networkPattern === "Primary") {
-        interfaces.push({ name: "primary", masquerade: {} });
-        networks.push({ name: "primary", pod: {} });
+        interfaces.push(defaultPodInterface);
+        networks.push({ name: "default", pod: {} });
     } else if (networkPattern === "PrimarySecondary") {
-        interfaces.push({ name: "default", masquerade: {} });
+        interfaces.push(defaultPodInterface);
         networks.push({ name: "default", pod: {} });
         addSecondaryNetworks();
     }
