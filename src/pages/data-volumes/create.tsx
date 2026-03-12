@@ -114,7 +114,7 @@ export const DataVolumeCreate = () => {
             };
         } else if (data.sourceType === "pvc") {
             resource.spec.source.pvc = { name: data.pvcName, namespace: data.metadata.namespace };
-            resource.spec.storage = { resources: { requests: { storage: data.storage } } }
+            resource.spec.storage = { accessModes: ["ReadWriteMany"], resources: { requests: { storage: data.storage } } }
         }
 
         onFinish(resource);
